@@ -81,6 +81,21 @@ impl std::ops::IndexMut<(usize, usize)> for Face {
         &mut self.data[index.0][index.1]
     }
 }
+impl Face {
+    fn matched(&self, other: &Face) -> bool {
+        for i in 0..3 {
+            for j in 0..3 {
+                if self[(i, j)] != Color::Wildcard
+                    && other[(i, j)] != Color::Wildcard
+                    && self[(i, j)] != other[(i, j)]
+                {
+                    return false;
+                }
+            }
+        }
+        true
+    }
+}
 
 macro_rules! rotate {
     ($shift:expr, [ $( $loc:expr ),* $(,)? ]) => {
@@ -166,6 +181,7 @@ impl Cube {
         while buffer.len() < 9 {
             while line.is_empty() {
                 let _ = stdin.read_line(&mut line);
+                line = line.trim().to_string();
             }
             buffer.push(line.clone());
             line.clear();
@@ -403,10 +419,26 @@ impl Cube {
     }
 }
 
+impl Cube {
+    fn matched(&self, other: &Cube) -> bool {
+        self.up.matched(&other.up)
+            && self.down.matched(&other.down)
+            && self.right.matched(&other.right)
+            && self.left.matched(&other.left)
+            && self.front.matched(&other.front)
+            && self.back.matched(&other.back)
+    }
+}
+
 fn main() {
     let mut cube = Cube::read();
+    let goal = Cube::read();
     use Operation::*;
+    println!("Init:\n{}", &cube);
+    println!("Goal:\n{}", &goal);
+    cube.apply(Up(false));
+    cube.apply(Down(true));
+    cube.apply(Down(true));
     println!("{}", &cube);
-    cube.apply(X(true));
-    println!("{}", &cube);
+    println!("{}", cube.matched(&goal));
 }
