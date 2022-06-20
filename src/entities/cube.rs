@@ -1,7 +1,7 @@
 use crate::entities::{Face, Operation};
 use crate::rotate;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cube {
     pub front: Face,
     pub back: Face,
@@ -50,15 +50,17 @@ impl Cube {
     }
     pub fn read() -> Self {
         let stdin = std::io::stdin();
-        let mut line = String::new();
         let mut buffer = vec![];
         while buffer.len() < 9 {
+            let mut line = String::new();
             while line.is_empty() {
                 let _ = stdin.read_line(&mut line);
                 line = line.trim().to_string();
+                if line.starts_with('#') {
+                    line.clear();
+                }
             }
             buffer.push(line.clone());
-            line.clear();
         }
         Cube::from(&buffer.iter().map(|s| s.as_str()).collect())
     }

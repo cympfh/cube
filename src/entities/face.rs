@@ -1,7 +1,7 @@
 use crate::entities::Color;
 use crate::rotate;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Face {
     data: Vec<Vec<Color>>,
 }

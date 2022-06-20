@@ -1,5 +1,6 @@
 /// https://tribox.com/3x3x3/solution/notation/
 /// Omit: E and S
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Operation {
     Up(bool),
     Down(bool),
@@ -13,6 +14,26 @@ pub enum Operation {
     X(bool),
     Y(bool),
     Z(bool),
+}
+
+impl Operation {
+    pub fn rev(&self) -> Self {
+        use Operation::*;
+        match self {
+            Up(ccw) => Up(!ccw),
+            Down(ccw) => Down(!ccw),
+            Left(ccw) => Left(!ccw),
+            Right(ccw) => Right(!ccw),
+            Front(ccw) => Front(!ccw),
+            Back(ccw) => Back(!ccw),
+            Middle(ccw) => Middle(!ccw),
+            Equator(ccw) => Equator(!ccw),
+            Standing(ccw) => Standing(!ccw),
+            X(ccw) => X(!ccw),
+            Y(ccw) => Y(!ccw),
+            Z(ccw) => Z(!ccw),
+        }
+    }
 }
 
 impl std::fmt::Display for Operation {
@@ -40,12 +61,12 @@ impl std::fmt::Display for Operation {
                 Equator(false) => "E'",
                 Standing(true) => "S",
                 Standing(false) => "S'",
-                X(true) => "X",
-                X(false) => "X'",
-                Y(true) => "Y",
-                Y(false) => "Y'",
-                Z(true) => "Z",
-                Z(false) => "Z'",
+                X(true) => "x",
+                X(false) => "x'",
+                Y(true) => "y",
+                Y(false) => "y'",
+                Z(true) => "z",
+                Z(false) => "z'",
             }
         )
     }
