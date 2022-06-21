@@ -7,10 +7,12 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
-    #[structopt(long, default_value = "10")]
+    #[structopt(long, default_value = "9")]
     max_depth: usize,
     #[structopt(short, long)]
     verbose: bool,
+    #[structopt(long, help = "exact equality check")]
+    exact: bool,
 
     #[structopt(short, long)]
     up: bool,
@@ -33,14 +35,15 @@ fn solve(
     goal: &Cube,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
+    exact: bool,
     verbose: bool,
 ) -> Option<Ops> {
-    let xyz_map = solve_xyz(goal);
-    solve_wo_xyz(state, &xyz_map, allowed_ops, max_depth, verbose)
+    let mut goal_map = xyz(goal);
+    solve_wo_xyz(state, &mut goal_map, allowed_ops, max_depth, exact, verbose)
 }
 
 /// Set of all cube states from the given state only using xyz
-fn solve_xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
+fn xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
     const MAX_DEPTH: usize = 3;
     const ALLOWED_OPS: [Operation; 6] = [
         Operation::X(true),
@@ -78,25 +81,43 @@ fn solve_xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
     map
 }
 
-/// search with xyz_map
+/// Bi-direction search with xyz_map
 fn solve_wo_xyz(
     state: &Cube,
-    xyz_map: &BTreeMap<Cube, Ops>,
+    goal_map: &mut BTreeMap<Cube, Ops>,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
+    exact: bool,
     verbose: bool,
 ) -> Option<Ops> {
+    const MAX_GOALMAP_SIZE: usize = 1000;
     let mut q = BinaryHeap::new();
-    q.push((Reverse(0), state.clone(), Ops::default()));
+    q.push((Reverse(0), state.clone(), Ops::default(), true));
+    for (c, ops) in goal_map.iter() {
+        q.push((Reverse(ops.len()), c.clone(), ops.clone(), false));
+    }
     let mut searching_depth: usize = 0;
-    while let Some((_, c, mut ops)) = q.pop() {
-        {
-            for (d, xyz_ops) in xyz_map.iter() {
-                if c.matched(d) {
-                    ops.extend(&xyz_ops.rev());
+    while let Some((_, c, mut ops, from_start)) = q.pop() {
+        if from_start {
+            if exact {
+                if goal_map.contains_key(&c) {
+                    let ops_from_goal = goal_map[&c].clone();
+                    ops.extend(&ops_from_goal.rev());
                     return Some(ops);
                 }
+            } else {
+                for (d, ops_from_goal) in goal_map.iter() {
+                    if c.matched(d) {
+                        ops.extend(&ops_from_goal.rev());
+                        return Some(ops);
+                    }
+                }
             }
+        } else {
+            if !exact && goal_map.len() > MAX_GOALMAP_SIZE {
+                continue;
+            }
+            goal_map.insert(c.clone(), ops.clone());
         }
         if ops.len() >= max_depth {
             continue;
@@ -114,7 +135,7 @@ fn solve_wo_xyz(
             c.apply(op);
             let mut ops = ops.clone();
             ops.push(op);
-            q.push((Reverse(ops.len()), c, ops));
+            q.push((Reverse(ops.len()), c, ops, from_start));
         }
         if verbose && ops.len() > searching_depth {
             searching_depth = ops.len();
@@ -157,9 +178,9 @@ fn main() {
         allowed_ops.push(Middle(true));
         allowed_ops.push(Middle(false));
     }
-
-    if opt.verbose {
-        eprintln!(">>> opt = {:?}", &opt);
+    if allowed_ops.is_empty() {
+        eprintln!("ERROR: No Operations specified");
+        return;
     }
 
     let cube = Cube::read();
@@ -167,7 +188,14 @@ fn main() {
     println!("Init:\n{}", &cube);
     println!("Goal:\n{}", &goal);
 
-    if let Some(ops) = solve(&cube, &goal, allowed_ops, opt.max_depth, opt.verbose) {
+    if let Some(ops) = solve(
+        &cube,
+        &goal,
+        allowed_ops,
+        opt.max_depth,
+        opt.exact,
+        opt.verbose,
+    ) {
         println!("Solved: {}", ops);
         if opt.verbose {
             let c = ops.apply(&cube);
