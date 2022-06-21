@@ -5,4 +5,4 @@ mod operation;
 pub use color::Color;
 pub use cube::Cube;
 pub use face::Face;
-pub use operation::Operation;
+pub use operation::{Operation, Ops};

@@ -71,3 +71,41 @@ impl std::fmt::Display for Operation {
         )
     }
 }
+
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct Ops {
+    data: Vec<Operation>,
+}
+
+impl Ops {
+    pub fn push(&mut self, op: Operation) {
+        self.data.push(op);
+    }
+    pub fn len(&self) -> usize {
+        self.data.len()
+    }
+    pub fn last(&self) -> Option<Operation> {
+        self.data.last().cloned()
+    }
+    pub fn rev(&self) -> Self {
+        let mut reversed = vec![];
+        for &op in self.data.iter().rev() {
+            reversed.push(op.rev());
+        }
+        Self { data: reversed }
+    }
+    pub fn extend(&mut self, other: &Ops) {
+        for &op in other.data.iter() {
+            self.data.push(op);
+        }
+    }
+}
+
+impl std::fmt::Display for Ops {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for op in self.data.iter() {
+            write!(f, "{}", op)?;
+        }
+        Ok(())
+    }
+}
