@@ -1,0 +1,23 @@
+# Step2: F2L [3/4]
+# cargo run --release -- -v -frudl --max-depth 8 < tests/cfop/4
+# Solved: U'LUL'
+
+YYB
+OYG
+OYR
+YBBWYOWRRGBB
+RRRGGGOOOYBB
+YRRGGGOOYRBG
+OWW
+WWW
+BWW
+
+***
+***
+***
+************
+*RRGGGOOOBB*
+*RRGGGOOOBB*
+*WW
+WWW
+WWW

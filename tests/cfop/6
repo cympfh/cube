@@ -1,0 +1,24 @@
+# OLL
+# cargo run --release -- -v -frudl --max-depth 8 < tests/cfop/6
+# Solved: R'D'LF'L'DRF'UF
+
+YYY
+YYO
+RGG
+BYOYYOBRRGBY
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+WWW
+WWW
+WWW
+
+
+YYY
+YYY
+YYY
+************
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+WWW
+WWW
+WWW
