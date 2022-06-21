@@ -56,8 +56,12 @@ fn solve_xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
     while let Some((c, ops)) = q.pop_front() {
         if ops.len() < MAX_DEPTH {
             let last = ops.last();
+            let last_repeat = ops.last_repeat();
             for &op in ALLOWED_OPS.iter() {
                 if last == Some(op.rev()) {
+                    continue;
+                }
+                if last_repeat == Some(op) {
                     continue;
                 }
                 let mut c = c.clone();
@@ -98,8 +102,12 @@ fn solve_wo_xyz(
             continue;
         }
         let last = ops.last();
+        let last_repeat = ops.last_repeat();
         for &op in allowed_ops.iter() {
             if last == Some(op.rev()) {
+                continue;
+            }
+            if last_repeat == Some(op) {
                 continue;
             }
             let mut c = c.clone();

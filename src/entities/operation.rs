@@ -89,6 +89,15 @@ impl Ops {
     pub fn last(&self) -> Option<Operation> {
         self.data.last().cloned()
     }
+    /// if the last 2 operations are same, dont repeat it.
+    pub fn last_repeat(&self) -> Option<Operation> {
+        let n = self.data.len();
+        if n >= 2 && self.data[n - 2] == self.data[n - 1] {
+            Some(self.data[n - 1])
+        } else {
+            None
+        }
+    }
     pub fn rev(&self) -> Self {
         let mut reversed = vec![];
         for &op in self.data.iter().rev() {
