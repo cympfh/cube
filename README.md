@@ -1,6 +1,37 @@
 # cube
 cube solver
 
+## Usage
+
+```bash
+$ cargo run -- --help
+$ cargo run -- -udf < sample.input
+
+Init:
+YYY
+YYY
+YYY
+GGGOOOBBBRRR
+RRRGGGOOOBBB
+OOOBBBRRRGGG
+WWW
+WWW
+WWW
+
+Goal:
+YYY
+YYY
+YYY
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+WWW
+WWW
+WWW
+
+Solved: DDU'
+```
+
 ## Format
 
 ### Colors
