@@ -20,6 +20,16 @@ impl Face {
     pub fn show(&self, i: usize) -> String {
         self.data[i].iter().map(|c| format!("{}", c)).collect()
     }
+    pub fn has_wildcard(&self) -> bool {
+        for i in 0..3 {
+            for j in 0..3 {
+                if self.data[i][j] == Color::Wildcard {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }
 
 impl std::fmt::Display for Face {

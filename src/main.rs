@@ -11,8 +11,6 @@ struct Opt {
     max_depth: usize,
     #[structopt(short, long)]
     verbose: bool,
-    #[structopt(long, help = "exact equality check")]
-    exact: bool,
 
     #[structopt(short, long)]
     up: bool,
@@ -35,10 +33,10 @@ fn solve(
     goal: &Cube,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
-    exact: bool,
     verbose: bool,
 ) -> Option<Ops> {
     let mut goal_map = xyz(goal);
+    let exact = !state.has_wildcard() && !goal.has_wildcard();
     solve_wo_xyz(state, &mut goal_map, allowed_ops, max_depth, exact, verbose)
 }
 
@@ -188,14 +186,7 @@ fn main() {
     println!("Init:\n{}", &cube);
     println!("Goal:\n{}", &goal);
 
-    if let Some(ops) = solve(
-        &cube,
-        &goal,
-        allowed_ops,
-        opt.max_depth,
-        opt.exact,
-        opt.verbose,
-    ) {
+    if let Some(ops) = solve(&cube, &goal, allowed_ops, opt.max_depth, opt.verbose) {
         println!("Solved: {}", ops);
         if opt.verbose {
             let c = ops.apply(&cube);

@@ -72,6 +72,14 @@ impl Cube {
             && self.front.matched(&other.front)
             && self.back.matched(&other.back)
     }
+    pub fn has_wildcard(&self) -> bool {
+        self.up.has_wildcard()
+            || self.down.has_wildcard()
+            || self.right.has_wildcard()
+            || self.left.has_wildcard()
+            || self.front.has_wildcard()
+            || self.back.has_wildcard()
+    }
 }
 
 impl std::fmt::Display for Cube {

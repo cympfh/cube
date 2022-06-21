@@ -1,5 +1,5 @@
 # H-perm
-# cargo run --release -- -v --exact -frum < tests/pll/h
+# cargo run --release -- -v -frum < tests/pll/h
 YYY
 YYY
 YYY

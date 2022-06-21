@@ -1,5 +1,5 @@
 # T-perm
-# cargo run --release -- -v --exact -fru < tests/pll/t
+# cargo run --release -- -v -fru < tests/pll/t
 YYY
 YYY
 YYY
