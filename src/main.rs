@@ -86,10 +86,13 @@ fn solve_wo_xyz(
     q.push((Reverse(0), state.clone(), Ops::default()));
     let mut searching_depth: usize = 0;
     while let Some((_, c, mut ops)) = q.pop() {
-        if xyz_map.contains_key(&c) {
-            let xyz_ops = xyz_map[&c].clone();
-            ops.extend(&xyz_ops.rev());
-            return Some(ops);
+        {
+            for (d, xyz_ops) in xyz_map.iter() {
+                if c.matched(d) {
+                    ops.extend(&xyz_ops.rev());
+                    return Some(ops);
+                }
+            }
         }
         if ops.len() >= max_depth {
             continue;
