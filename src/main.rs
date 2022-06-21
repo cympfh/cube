@@ -3,6 +3,28 @@ mod util;
 use crate::entities::{Cube, Operation};
 use std::cmp::Reverse;
 use std::collections::BinaryHeap;
+use structopt::StructOpt;
+
+#[derive(StructOpt)]
+struct Opt {
+    #[structopt(short, long)]
+    up: bool,
+    #[structopt(short, long)]
+    down: bool,
+    #[structopt(short, long)]
+    front: bool,
+    #[structopt(short, long)]
+    back: bool,
+    #[structopt(short, long)]
+    left: bool,
+    #[structopt(short, long)]
+    right: bool,
+    #[structopt(short, long)]
+    middle: bool,
+
+    #[structopt(short, long)]
+    verbose: bool,
+}
 
 pub fn solve(
     state: &Cube,
