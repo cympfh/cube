@@ -1,0 +1,21 @@
+# Dot Pattern
+# cargo run -- -v -durm --max-depth 6 < tests/dot
+WWW
+WYW
+WWW
+************
+*B**O**G**R*
+************
+YYY
+YWY
+YYY
+
+WWW
+WWW
+WWW
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+RRRGGGOOOBBB
+YYY
+YYY
+YYY
