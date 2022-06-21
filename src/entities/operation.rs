@@ -1,3 +1,5 @@
+use crate::entities::Cube;
+
 /// https://tribox.com/3x3x3/solution/notation/
 /// Omit: E and S
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -99,13 +101,24 @@ impl Ops {
             self.data.push(op);
         }
     }
+    pub fn apply(&self, cube: &Cube) -> Cube {
+        let mut c = cube.clone();
+        for &op in self.data.iter() {
+            c.apply(op);
+        }
+        c
+    }
 }
 
 impl std::fmt::Display for Ops {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for op in self.data.iter() {
-            write!(f, "{}", op)?;
+        if self.data.is_empty() {
+            write!(f, "(nop)")
+        } else {
+            for op in self.data.iter() {
+                write!(f, "{}", op)?;
+            }
+            Ok(())
         }
-        Ok(())
     }
 }

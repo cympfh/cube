@@ -7,7 +7,7 @@ use structopt::StructOpt;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
-    #[structopt(long, default_value = "25")]
+    #[structopt(long, default_value = "10")]
     max_depth: usize,
     #[structopt(short, long)]
     verbose: bool,
@@ -39,7 +39,7 @@ fn solve(
     solve_wo_xyz(state, &xyz_map, allowed_ops, max_depth, verbose)
 }
 
-/// Set of all cubes from the state only using xyz
+/// Set of all cube states from the given state only using xyz
 fn solve_xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
     const MAX_DEPTH: usize = 3;
     const ALLOWED_OPS: [Operation; 6] = [
@@ -151,7 +151,7 @@ fn main() {
     }
 
     if opt.verbose {
-        eprintln!(">>> opt = {:?}", &allowed_ops);
+        eprintln!(">>> opt = {:?}", &opt);
     }
 
     let cube = Cube::read();
@@ -161,6 +161,10 @@ fn main() {
 
     if let Some(ops) = solve(&cube, &goal, allowed_ops, opt.max_depth, opt.verbose) {
         println!("Solved: {}", ops);
+        if opt.verbose {
+            let c = ops.apply(&cube);
+            eprintln!("Validation:\n{}", c);
+        }
     } else {
         println!("Not Solved");
     }
