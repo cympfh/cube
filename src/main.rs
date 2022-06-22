@@ -37,6 +37,9 @@ fn solve(
 ) -> Option<Ops> {
     let mut goal_map = xyz(goal);
     let exact = !state.has_wildcard() && !goal.has_wildcard();
+    if verbose {
+        eprintln!(">>> exact = {}", exact);
+    }
     solve_wo_xyz(state, &mut goal_map, allowed_ops, max_depth, exact, verbose)
 }
 

@@ -6,6 +6,7 @@ pub enum Color {
     Orange,
     Blue,
     Green,
+    Other,
     Wildcard,
 }
 
@@ -19,6 +20,7 @@ impl Color {
             'o' => Orange,
             'b' => Blue,
             'g' => Green,
+            '.' => Other,
             '*' => Wildcard,
             _ => panic!("Unknown color: {}", c),
         }
@@ -38,6 +40,7 @@ impl std::fmt::Display for Color {
                 Orange => 'O',
                 Blue => 'B',
                 Green => 'G',
+                Other => '.',
                 _ => '*',
             }
         )

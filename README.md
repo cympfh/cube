@@ -42,6 +42,7 @@ Solved: DDU'
 - `G`: Green
 - `R`: Red
 - `O`: Orange
+- `.`: Other Color (`.` matches to `.`)
 - `*`: Wildcard (Any colors matching)
 
 ### A Face
