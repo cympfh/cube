@@ -3,18 +3,19 @@ use crate::rotate;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Face {
-    data: Vec<Vec<Color>>,
+    data: [[Color; 3]; 3],
 }
 
 impl Face {
     pub fn from(lines: &Vec<&str>) -> Self {
-        let mut data = vec![vec![]; 3];
+        let mut data = vec![];
         for i in 0..3 {
-            for j in 0..3 {
-                let c = Color::from(lines[i].chars().nth(j).unwrap_or('_'));
-                data[i].push(c);
-            }
+            let line: Vec<Color> = (0..3)
+                .map(|j| Color::from(lines[i].chars().nth(j).unwrap_or('_')))
+                .collect();
+            data.push(line.try_into().unwrap());
         }
+        let data: [[Color; 3]; 3] = data.try_into().unwrap();
         Self { data }
     }
     pub fn show(&self, i: usize) -> String {
