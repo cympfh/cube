@@ -16,6 +16,8 @@ struct Opt {
     max_depth: usize,
     #[structopt(short, long)]
     verbose: bool,
+    #[structopt(short, long)]
+    quiet: bool,
 
     #[structopt(short, long)]
     up: bool,
@@ -145,13 +147,13 @@ fn solve_wo_xyz(
 }
 
 fn main() {
-    env::set_var("RUST_LOG", "info");
+    let opt = Opt::from_args();
+
+    env::set_var("RUST_LOG", if !opt.quiet { "info" } else { "error" });
     env_logger::builder()
         .format_target(false)
         .format_indent(Some(0))
         .init();
-
-    let opt = Opt::from_args();
 
     let mut allowed_ops = vec![];
     if opt.up {
