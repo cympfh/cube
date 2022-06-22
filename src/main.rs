@@ -3,6 +3,7 @@ mod util;
 
 use crate::entities::{Cube, Operation, Ops};
 use log::{error, info, warn};
+use serde_json::json;
 use std::cmp::Reverse;
 use std::collections::*;
 use std::env;
@@ -201,8 +202,21 @@ fn main() {
             let c = ops.apply(&cube);
             info!("Validation:\n{}", c);
         }
+        println!(
+            "{}",
+            json!({
+                "ok": true,
+                "solutions": [
+                    {
+                        "algorithm": format!("{}", ops),
+                        "length": ops.len(),
+                    }
+                ],
+            })
+        );
     } else {
         info!("Not Solved");
+        println!("{}", json!({ "ok": false }));
     }
 }
 
