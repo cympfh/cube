@@ -84,7 +84,7 @@ impl Cube {
 
 impl std::fmt::Display for Cube {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.up)?;
+        writeln!(f, "{}", self.up)?;
         for i in 0..3 {
             write!(f, "{}", self.front.show(i))?;
             write!(f, "{}", self.right.show(i))?;

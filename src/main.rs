@@ -1,9 +1,13 @@
 mod entities;
 mod util;
+
 use crate::entities::{Cube, Operation, Ops};
+use log::{error, info, warn};
 use std::cmp::Reverse;
 use std::collections::*;
+use std::env;
 use structopt::StructOpt;
+use Operation::*;
 
 #[derive(Debug, StructOpt)]
 struct Opt {
@@ -38,7 +42,7 @@ fn solve(
     let mut goal_map = xyz(goal);
     let exact = !state.has_wildcard() && !goal.has_wildcard();
     if verbose {
-        eprintln!(">>> exact = {}", exact);
+        trace!(exact);
     }
     solve_wo_xyz(state, &mut goal_map, allowed_ops, max_depth, exact, verbose)
 }
@@ -46,14 +50,7 @@ fn solve(
 /// Set of all cube states from the given state only using xyz
 fn xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
     const MAX_DEPTH: usize = 3;
-    const ALLOWED_OPS: [Operation; 6] = [
-        Operation::X(true),
-        Operation::X(false),
-        Operation::Y(true),
-        Operation::Y(false),
-        Operation::Z(true),
-        Operation::Z(false),
-    ];
+    const ALLOWED_OPS: [Operation; 6] = [X(true), X(false), Y(true), Y(false), Z(true), Z(false)];
     let mut map = BTreeMap::new();
     let mut q = VecDeque::new();
     q.push_back((state.clone(), Ops::default()));
@@ -140,16 +137,21 @@ fn solve_wo_xyz(
         }
         if verbose && ops.len() > searching_depth {
             searching_depth = ops.len();
-            eprintln!("Searching depth: {}", searching_depth);
+            info!("Searching depth: {}", searching_depth);
         }
     }
     None
 }
 
 fn main() {
-    use Operation::*;
+    env::set_var("RUST_LOG", "info");
+    env_logger::builder()
+        .format_target(false)
+        .format_indent(Some(0))
+        .init();
 
     let opt = Opt::from_args();
+
     let mut allowed_ops = vec![];
     if opt.up {
         allowed_ops.push(Up(true));
@@ -180,22 +182,34 @@ fn main() {
         allowed_ops.push(Middle(false));
     }
     if allowed_ops.is_empty() {
-        eprintln!("ERROR: No Operations specified");
+        error!("No Operations specified");
         return;
+    }
+
+    if opt.max_depth > 10 {
+        warn!("Too large max_depth: {}", opt.max_depth);
     }
 
     let cube = Cube::read();
     let goal = Cube::read();
-    println!("Init:\n{}", &cube);
-    println!("Goal:\n{}", &goal);
+    info!("Init:\n{}", &cube);
+    info!("Goal:\n{}", &goal);
 
     if let Some(ops) = solve(&cube, &goal, allowed_ops, opt.max_depth, opt.verbose) {
-        println!("Solved: {}", ops);
+        info!("Solved: {}", ops);
         if opt.verbose {
             let c = ops.apply(&cube);
-            eprintln!("Validation:\n{}", c);
+            info!("Validation:\n{}", c);
         }
     } else {
-        println!("Not Solved");
+        info!("Not Solved");
     }
+}
+
+#[macro_export]
+macro_rules! trace {
+    ($x:expr) => {
+        info!(">>> {} = {:?}", stringify!($x), $x)
+    };
+    ($($xs:expr),* $(,)?) => { trace!(($($xs),*)) }
 }

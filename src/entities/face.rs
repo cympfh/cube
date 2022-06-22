@@ -36,7 +36,7 @@ impl std::fmt::Display for Face {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", self.show(0))?;
         writeln!(f, "{}", self.show(1))?;
-        writeln!(f, "{}", self.show(2))
+        write!(f, "{}", self.show(2))
     }
 }
 
