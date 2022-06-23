@@ -297,8 +297,45 @@ impl Cube {
 
 #[cfg(test)]
 mod test {
-    use crate::{Cube, Operation};
+    use crate::{Cube, Operation, Ops};
     use Operation::*;
+
+    #[test]
+    fn test_canceling() {
+        let solved_cube = Cube::from(&vec![
+            "YYY",
+            "YYY",
+            "YYY",
+            "RRRGGGOOOBBB",
+            "RRRGGGOOOBBB",
+            "RRRGGGOOOBBB",
+            "WWW",
+            "WWW",
+            "WWW",
+        ]);
+        {
+            let u2 = Ops::new(vec![Up(true), Up(true)]);
+            let u2_prime = Ops::new(vec![Up(false), Up(false)]);
+            let c1 = u2.apply(&solved_cube);
+            let c2 = u2_prime.apply(&solved_cube);
+            assert_eq!(c1, c2);
+        }
+        {
+            let r2 = Ops::new(vec![Right(true), Right(true)]);
+            let r2_prime = Ops::new(vec![Right(false), Right(false)]);
+            let c1 = r2.apply(&solved_cube);
+            let c2 = r2_prime.apply(&solved_cube);
+            assert_eq!(c1, c2);
+        }
+        {
+            let r3 = Ops::new(vec![Right(true), Right(true), Right(true)]);
+            let r_prime = Ops::new(vec![Right(false)]);
+            let c1 = r3.apply(&solved_cube);
+            let c2 = r_prime.apply(&solved_cube);
+            assert_eq!(c1, c2);
+        }
+    }
+
     #[test]
     fn test_pll() {
         let c = Cube::from(&vec![

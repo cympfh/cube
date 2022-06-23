@@ -36,6 +36,23 @@ impl Operation {
             Z(ccw) => Z(!ccw),
         }
     }
+    pub fn is_reversed(&self) -> bool {
+        use Operation::*;
+        match self {
+            Up(ccw) => !ccw,
+            Down(ccw) => !ccw,
+            Left(ccw) => !ccw,
+            Right(ccw) => !ccw,
+            Front(ccw) => !ccw,
+            Back(ccw) => !ccw,
+            Middle(ccw) => !ccw,
+            Equator(ccw) => !ccw,
+            Standing(ccw) => !ccw,
+            X(ccw) => !ccw,
+            Y(ccw) => !ccw,
+            Z(ccw) => !ccw,
+        }
+    }
 }
 
 impl std::fmt::Display for Operation {
@@ -80,6 +97,10 @@ pub struct Ops {
 }
 
 impl Ops {
+    #[allow(dead_code)]
+    pub fn new(data: Vec<Operation>) -> Self {
+        Self { data }
+    }
     pub fn push(&mut self, op: Operation) {
         self.data.push(op);
     }
@@ -129,5 +150,38 @@ impl std::fmt::Display for Ops {
             }
             Ok(())
         }
+    }
+}
+
+#[cfg(test)]
+mod test_operation {
+    use crate::entities::{Operation, Ops};
+    use Operation::*;
+
+    #[test]
+    fn test_operation() {
+        let u = Up(true);
+        assert!(!u.is_reversed());
+        let u_prime = Up(false);
+        assert!(u_prime.is_reversed());
+    }
+
+    #[test]
+    fn test_ops() {
+        let mut ops = Ops::default();
+        assert_eq!(ops.last(), None);
+        assert_eq!(ops.last_repeat(), None);
+
+        ops.push(Up(true));
+        assert_eq!(ops.last(), Some(Up(true)));
+        assert_eq!(ops.last_repeat(), None);
+
+        ops.push(Up(true));
+        assert_eq!(ops.last(), Some(Up(true)));
+        assert_eq!(ops.last_repeat(), Some(Up(true)));
+
+        ops.push(Up(false));
+        assert_eq!(ops.last(), Some(Up(false)));
+        assert_eq!(ops.last_repeat(), None);
     }
 }

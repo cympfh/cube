@@ -133,6 +133,13 @@ fn solve_wo_xyz(
         if solutions.len() >= num {
             break;
         }
+        if ops.len() > max_depth {
+            continue;
+        }
+        if verbose && ops.len() > searching_depth {
+            searching_depth = ops.len();
+            info!("Searching depth: {}", searching_depth);
+        }
         if from_start {
             if let Some(solution) = found(&c, &mut ops, goal_map) {
                 info!("Solution: {}", solution);
@@ -149,15 +156,18 @@ fn solve_wo_xyz(
             }
             goal_map.insert(c.clone(), ops.clone());
         }
-        if ops.len() > max_depth {
-            continue;
-        }
         let last = ops.last();
         let last_repeat = ops.last_repeat();
         for &op in allowed_ops.iter() {
+            // Dont Canceling Move (e.g. UU')
             if last == Some(op.rev()) {
                 continue;
             }
+            // Dont repeat Reverse Move (e.g. U'U' is same to UU)
+            if last == Some(op) && op.is_reversed() == from_start {
+                continue;
+            }
+            // Dont repeat 3 times (e.g. UUU is same to U')
             if last_repeat == Some(op) {
                 continue;
             }
@@ -166,10 +176,6 @@ fn solve_wo_xyz(
             let mut ops = ops.clone();
             ops.push(op);
             q.push((Reverse(ops.len()), c, ops, from_start));
-        }
-        if verbose && ops.len() > searching_depth {
-            searching_depth = ops.len();
-            info!("Searching depth: {}", searching_depth);
         }
     }
     solutions
