@@ -10,10 +10,12 @@ use std::env;
 use structopt::StructOpt;
 use Operation::*;
 
-#[derive(Debug, StructOpt)]
+#[derive(StructOpt)]
 struct Opt {
     #[structopt(long, default_value = "9")]
     max_depth: usize,
+    #[structopt(short, long, default_value = "1", help = "max num of algorithm")]
+    num: usize,
     #[structopt(short, long)]
     verbose: bool,
     #[structopt(short, long)]
@@ -40,14 +42,23 @@ fn solve(
     goal: &Cube,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
+    num: usize,
     verbose: bool,
-) -> Option<Ops> {
+) -> Vec<Ops> {
     let mut goal_map = xyz(goal);
     let exact = !state.has_wildcard() && !goal.has_wildcard();
     if verbose {
         trace!(exact);
     }
-    solve_wo_xyz(state, &mut goal_map, allowed_ops, max_depth, exact, verbose)
+    solve_wo_xyz(
+        state,
+        &mut goal_map,
+        allowed_ops,
+        max_depth,
+        num,
+        exact,
+        verbose,
+    )
 }
 
 /// Set of all cube states from the given state only using xyz
@@ -88,10 +99,12 @@ fn solve_wo_xyz(
     goal_map: &mut BTreeMap<Cube, Ops>,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
+    num: usize,
     exact: bool,
     verbose: bool,
-) -> Option<Ops> {
+) -> Vec<Ops> {
     const MAX_GOALMAP_SIZE: usize = 1000;
+    let mut solutions = vec![];
     let mut q = BinaryHeap::new();
     q.push((Reverse(0), state.clone(), Ops::default(), true));
     for (c, ops) in goal_map.iter() {
@@ -99,18 +112,23 @@ fn solve_wo_xyz(
     }
     let mut searching_depth: usize = 0;
     while let Some((_, c, mut ops, from_start)) = q.pop() {
+        if solutions.len() >= num {
+            break;
+        }
         if from_start {
             if exact {
                 if goal_map.contains_key(&c) {
                     let ops_from_goal = goal_map[&c].clone();
                     ops.extend(&ops_from_goal.rev());
-                    return Some(ops);
+                    solutions.push(ops.clone());
+                    continue;
                 }
             } else {
                 for (d, ops_from_goal) in goal_map.iter() {
                     if c.matched(d) {
                         ops.extend(&ops_from_goal.rev());
-                        return Some(ops);
+                        solutions.push(ops.clone());
+                        continue;
                     }
                 }
             }
@@ -143,7 +161,7 @@ fn solve_wo_xyz(
             info!("Searching depth: {}", searching_depth);
         }
     }
-    None
+    solutions
 }
 
 fn main() {
@@ -198,27 +216,31 @@ fn main() {
     info!("Init:\n{}", &cube);
     info!("Goal:\n{}", &goal);
 
-    if let Some(ops) = solve(&cube, &goal, allowed_ops, opt.max_depth, opt.verbose) {
-        info!("Solved: {}", ops);
-        if opt.verbose {
-            let c = ops.apply(&cube);
-            info!("Validation:\n{}", c);
-        }
-        println!(
-            "{}",
-            json!({
-                "ok": true,
-                "solutions": [
-                    {
+    let algorithms = solve(
+        &cube,
+        &goal,
+        allowed_ops,
+        opt.max_depth,
+        opt.num,
+        opt.verbose,
+    );
+    if !algorithms.is_empty() {
+        let mut solutions = vec![];
+        for ops in algorithms.iter() {
+            info!("Solution: {}", ops);
+            if opt.verbose {
+                let c = ops.apply(&cube);
+                info!("Validation:\n{}", c);
+            }
+            solutions.push(json!({
                         "algorithm": format!("{}", ops),
                         "length": ops.len(),
-                    }
-                ],
-            })
-        );
+            }));
+        }
+        println!("{}", json!({ "ok": true, "solutions": solutions, }));
     } else {
-        info!("Not Solved");
-        println!("{}", json!({ "ok": false }));
+        info!("No Solution");
+        println!("{}", json!({ "ok": false, "solutions": [], }));
     }
 }
 
