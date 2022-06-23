@@ -120,7 +120,7 @@ fn solve_wo_xyz(
             }
             goal_map.insert(c.clone(), ops.clone());
         }
-        if ops.len() >= max_depth {
+        if ops.len() > max_depth {
             continue;
         }
         let last = ops.last();
