@@ -35,6 +35,12 @@ struct Opt {
     right: bool,
     #[structopt(short, long)]
     middle: bool,
+    #[structopt(short)]
+    x: bool,
+    #[structopt(short)]
+    y: bool,
+    #[structopt(short)]
+    z: bool,
 }
 
 fn solve(
@@ -218,6 +224,18 @@ fn main() {
     if opt.middle {
         allowed_ops.push(Middle(true));
         allowed_ops.push(Middle(false));
+    }
+    if opt.x {
+        allowed_ops.push(X(true));
+        allowed_ops.push(X(false));
+    }
+    if opt.y {
+        allowed_ops.push(Y(true));
+        allowed_ops.push(Y(false));
+    }
+    if opt.z {
+        allowed_ops.push(Z(true));
+        allowed_ops.push(Z(false));
     }
     if allowed_ops.is_empty() {
         error!("No Operations specified");
