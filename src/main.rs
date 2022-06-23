@@ -105,9 +105,9 @@ fn solve_wo_xyz(
 ) -> Vec<Ops> {
     const MAX_GOALMAP_SIZE: usize = 1000;
     let mut q = BinaryHeap::new();
-    q.push((Reverse(0), init_state.clone(), Ops::default(), true));
+    q.push((Reverse((0, true)), init_state.clone(), Ops::default(), true));
     for (c, ops) in goal_map.iter() {
-        q.push((Reverse(ops.len()), c.clone(), ops.clone(), false));
+        q.push((Reverse((ops.len(), false)), c.clone(), ops.clone(), false));
     }
 
     let mut solutions = vec![];
@@ -133,9 +133,6 @@ fn solve_wo_xyz(
         if solutions.len() >= num {
             break;
         }
-        if ops.len() > max_depth {
-            continue;
-        }
         if verbose && ops.len() > searching_depth {
             searching_depth = ops.len();
             info!("Searching depth: {}", searching_depth);
@@ -156,6 +153,9 @@ fn solve_wo_xyz(
             }
             goal_map.insert(c.clone(), ops.clone());
         }
+        if ops.len() >= max_depth {
+            continue;
+        }
         let last = ops.last();
         let last_repeat = ops.last_repeat();
         for &op in allowed_ops.iter() {
@@ -175,7 +175,7 @@ fn solve_wo_xyz(
             c.apply(op);
             let mut ops = ops.clone();
             ops.push(op);
-            q.push((Reverse(ops.len()), c, ops, from_start));
+            q.push((Reverse((ops.len(), from_start)), c, ops, from_start));
         }
     }
     solutions
