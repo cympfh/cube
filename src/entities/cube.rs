@@ -1,4 +1,4 @@
-use crate::entities::{Face, Operation};
+use crate::entities::{Color, Face, Operation};
 use crate::rotate;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -295,8 +295,44 @@ impl Cube {
     }
 }
 
+use std::collections::BTreeMap;
+impl Cube {
+    pub fn count(&self) -> BTreeMap<Color, usize> {
+        let mut count = BTreeMap::new();
+        for col in [
+            Color::Red,
+            Color::Orange,
+            Color::Blue,
+            Color::Green,
+            Color::White,
+            Color::Yellow,
+            Color::Other,
+            Color::Wildcard,
+        ] {
+            count.insert(col, 0);
+        }
+        for face in [
+            &self.front,
+            &self.back,
+            &self.up,
+            &self.down,
+            &self.left,
+            &self.right,
+        ] {
+            for i in 0..3 {
+                for j in 0..3 {
+                    let col = face.at(i, j);
+                    count.entry(col).and_modify(|i| *i += 1).or_insert(1);
+                }
+            }
+        }
+        count
+    }
+}
+
 #[cfg(test)]
-mod test {
+mod test_cube {
+    use crate::entities::Color;
     use crate::{Cube, Operation, Ops};
     use Operation::*;
 
@@ -647,5 +683,29 @@ mod test {
             "WWW",
         ]);
         assert!(c.matched(&d));
+    }
+
+    #[test]
+    fn test_count() {
+        let c = Cube::from(&vec![
+            "***",
+            "*.*",
+            "***",
+            "************",
+            "RRRGGGOOOBBB",
+            "RRRGGGOOOBBB",
+            "WWW",
+            "WWW",
+            "WWW",
+        ]);
+        let count = c.count();
+        assert_eq!(count[&Color::Red], 6);
+        assert_eq!(count[&Color::Green], 6);
+        assert_eq!(count[&Color::Orange], 6);
+        assert_eq!(count[&Color::Blue], 6);
+        assert_eq!(count[&Color::White], 9);
+        assert_eq!(count[&Color::Yellow], 0);
+        assert_eq!(count[&Color::Other], 1);
+        assert_eq!(count[&Color::Wildcard], 20);
     }
 }

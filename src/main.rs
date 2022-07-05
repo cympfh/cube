@@ -1,7 +1,7 @@
 mod entities;
 mod util;
 
-use crate::entities::{Cube, Operation, Ops};
+use crate::entities::{Color, Cube, Operation, Ops};
 use log::{error, info, warn};
 use serde_json::json;
 use std::cmp::Reverse;
@@ -187,6 +187,30 @@ fn solve_wo_xyz(
     solutions
 }
 
+fn validation(c: &Cube, d: &Cube) -> Result<(), Color> {
+    let count = c.count();
+    let dount = d.count();
+    let cwild = count[&Color::Wildcard];
+    let dwild = dount[&Color::Wildcard];
+    for col in vec![
+        Color::Red,
+        Color::Blue,
+        Color::Yellow,
+        Color::White,
+        Color::Orange,
+        Color::Green,
+        Color::Other,
+    ] {
+        if count[&col] > dount[&col] + dwild {
+            return Err(col);
+        }
+        if count[&col] + cwild < dount[&col] {
+            return Err(col);
+        }
+    }
+    Ok(())
+}
+
 fn main() {
     let opt = Opt::from_args();
 
@@ -250,6 +274,11 @@ fn main() {
     let goal = Cube::read();
     info!("Init:\n{}", &cube);
     info!("Goal:\n{}", &goal);
+
+    if let Err(col) = validation(&cube, &goal) {
+        error!("Validation Failed. Check number of color:{}.", col);
+        return;
+    }
 
     let algorithms = solve(
         &cube,

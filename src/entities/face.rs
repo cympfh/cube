@@ -31,6 +31,9 @@ impl Face {
         }
         false
     }
+    pub fn at(&self, i: usize, j: usize) -> Color {
+        self.data[i][j]
+    }
 }
 
 impl std::fmt::Display for Face {
