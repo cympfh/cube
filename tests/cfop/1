@@ -1,5 +1,5 @@
 # Step1: White Cross
-# cargo run --release -- -v -frudlb < tests/cfop/1
+# cargo run --release -- -v -FRUDLB < tests/cfop/1
 # Solved: FL'B'DR'D
 WYW
 BYB

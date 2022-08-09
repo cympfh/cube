@@ -1,5 +1,5 @@
 # DDU' + (xyz)
-# cargo run -- -ud --max-depth 3 < tests/ddu
+# cargo run -- -UD --max-depth 3 < tests/ddu
 YYY
 YYY
 YYY

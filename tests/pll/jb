@@ -1,5 +1,5 @@
 # J-perm b
-# cargo run --release -- -v -fru < tests/pll/jb
+# cargo run --release -- -v -FRU < tests/pll/jb
 YYY
 YYY
 YYY

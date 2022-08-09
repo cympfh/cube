@@ -179,6 +179,26 @@ impl Cube {
                     ]
                 );
             }
+            Left(clockwise) => {
+                self.left.rotate(clockwise);
+                rotate!(
+                    if clockwise { 3 } else { 9 },
+                    [
+                        self.up[(0, 0)],
+                        self.up[(1, 0)],
+                        self.up[(2, 0)],
+                        self.front[(0, 0)],
+                        self.front[(1, 0)],
+                        self.front[(2, 0)],
+                        self.down[(0, 0)],
+                        self.down[(1, 0)],
+                        self.down[(2, 0)],
+                        self.back[(2, 2)],
+                        self.back[(1, 2)],
+                        self.back[(0, 2)],
+                    ]
+                );
+            }
             Right(clockwise) => {
                 self.right.rotate(clockwise);
                 rotate!(
@@ -199,25 +219,29 @@ impl Cube {
                     ]
                 );
             }
-            Left(clockwise) => {
-                self.left.rotate(clockwise);
-                rotate!(
-                    if clockwise { 3 } else { 9 },
-                    [
-                        self.up[(0, 0)],
-                        self.up[(1, 0)],
-                        self.up[(2, 0)],
-                        self.front[(0, 0)],
-                        self.front[(1, 0)],
-                        self.front[(2, 0)],
-                        self.down[(0, 0)],
-                        self.down[(1, 0)],
-                        self.down[(2, 0)],
-                        self.back[(2, 2)],
-                        self.back[(1, 2)],
-                        self.back[(0, 2)],
-                    ]
-                );
+            UpDouble(clockwise) => {
+                self.apply(Up(clockwise));
+                self.apply(Equator(!clockwise));
+            }
+            DownDouble(clockwise) => {
+                self.apply(Down(clockwise));
+                self.apply(Equator(clockwise));
+            }
+            FrontDouble(clockwise) => {
+                self.apply(Front(clockwise));
+                self.apply(Standing(clockwise));
+            }
+            BackDouble(clockwise) => {
+                self.apply(Back(clockwise));
+                self.apply(Standing(!clockwise));
+            }
+            LeftDouble(clockwise) => {
+                self.apply(Left(clockwise));
+                self.apply(Middle(clockwise));
+            }
+            RightDouble(clockwise) => {
+                self.apply(Right(clockwise));
+                self.apply(Middle(!clockwise));
             }
             Middle(clockwise) => {
                 rotate!(
