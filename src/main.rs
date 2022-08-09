@@ -21,20 +21,39 @@ struct Opt {
     #[structopt(short, long)]
     quiet: bool,
 
-    #[structopt(short, long)]
+    #[structopt(short = "U")]
     up: bool,
-    #[structopt(short, long)]
+    #[structopt(short = "D")]
     down: bool,
-    #[structopt(short, long)]
+    #[structopt(short = "F")]
     front: bool,
-    #[structopt(short, long)]
+    #[structopt(short = "B")]
     back: bool,
-    #[structopt(short, long)]
+    #[structopt(short = "L")]
     left: bool,
-    #[structopt(short, long)]
+    #[structopt(short = "R")]
     right: bool,
-    #[structopt(short, long)]
+
+    #[structopt(short = "u", long = "Uw")]
+    up_double: bool,
+    #[structopt(short = "d", long = "Dw")]
+    down_double: bool,
+    #[structopt(short = "f", long = "Fw")]
+    front_double: bool,
+    #[structopt(short = "b", long = "Bw")]
+    back_double: bool,
+    #[structopt(short = "l", long = "Lw")]
+    left_double: bool,
+    #[structopt(short = "r", long = "Rw")]
+    right_double: bool,
+
+    #[structopt(short = "M", long)]
     middle: bool,
+    #[structopt(short = "E", long)]
+    equator: bool,
+    #[structopt(short = "S", long)]
+    standing: bool,
+
     #[structopt(short)]
     x: bool,
     #[structopt(short)]
@@ -245,9 +264,41 @@ fn main() {
         allowed_ops.push(Right(true));
         allowed_ops.push(Right(false));
     }
+    if opt.up_double {
+        allowed_ops.push(UpDouble(true));
+        allowed_ops.push(UpDouble(false));
+    }
+    if opt.down_double {
+        allowed_ops.push(DownDouble(true));
+        allowed_ops.push(DownDouble(false));
+    }
+    if opt.front_double {
+        allowed_ops.push(FrontDouble(true));
+        allowed_ops.push(FrontDouble(false));
+    }
+    if opt.back_double {
+        allowed_ops.push(BackDouble(true));
+        allowed_ops.push(BackDouble(false));
+    }
+    if opt.left_double {
+        allowed_ops.push(LeftDouble(true));
+        allowed_ops.push(LeftDouble(false));
+    }
+    if opt.right_double {
+        allowed_ops.push(RightDouble(true));
+        allowed_ops.push(RightDouble(false));
+    }
     if opt.middle {
         allowed_ops.push(Middle(true));
         allowed_ops.push(Middle(false));
+    }
+    if opt.equator {
+        allowed_ops.push(Equator(true));
+        allowed_ops.push(Equator(false));
+    }
+    if opt.standing {
+        allowed_ops.push(Standing(true));
+        allowed_ops.push(Standing(false));
     }
     if opt.x {
         allowed_ops.push(X(true));

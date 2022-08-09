@@ -1,5 +1,5 @@
 # Dot Pattern
-# cargo run -- -v -durm --max-depth 6 < tests/dot
+# cargo run -- -v -DURM --max-depth 6 < tests/dot
 WWW
 WYW
 WWW

@@ -1,5 +1,5 @@
 # OLL
-# cargo run --release -- -v -frudl --max-depth 8 < tests/cfop/6
+# cargo run --release -- -v -FRUDL --max-depth 8 < tests/cfop/6
 # Solved: R'D'LF'L'DRF'UF
 
 YYY

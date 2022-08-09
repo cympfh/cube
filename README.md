@@ -5,7 +5,9 @@ cube solver
 
 ```bash
 $ cargo run -- --help
-$ cargo run -- -udf < sample.input
+
+# Solving with U, D and F
+$ cargo run -- -UDF < sample.input
 
 Init:
 YYY

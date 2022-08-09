@@ -1,5 +1,5 @@
 # Very Easy F2L
-# cargo run -- -fur < tests/f2l
+# cargo run -- -FUR < tests/f2l
 
 ...
 ...
