@@ -1,5 +1,6 @@
 # T-perm
-# cargo run --release -- -v -FRU < tests/pll/t
+# cube -FRU < tests/pll/t
+
 YYY
 YYY
 YYY
