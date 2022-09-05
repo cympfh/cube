@@ -134,6 +134,9 @@ impl Ops {
     pub fn push(&mut self, op: Operation) {
         self.data.push(op);
     }
+    pub fn pop(&mut self) -> Option<Operation> {
+        self.data.pop()
+    }
     pub fn len(&self) -> usize {
         self.data.len()
     }
@@ -167,6 +170,34 @@ impl Ops {
             c.apply(op);
         }
         c
+    }
+    pub fn shorten(&self) -> Self {
+        let mut ops = Ops::default();
+        for &op in self.data.iter() {
+            ops.push(op);
+            let m = ops.len();
+            if m >= 3 {
+                let a = ops.data[m - 1];
+                let b = ops.data[m - 2];
+                let c = ops.data[m - 3];
+                if a == b && a == c {
+                    ops.pop();
+                    ops.pop();
+                    ops.pop();
+                    ops.push(a.rev());
+                }
+            }
+            let m = ops.len();
+            if m >= 2 {
+                let a = ops.data[m - 1];
+                let b = ops.data[m - 2];
+                if a == b.rev() {
+                    ops.pop();
+                    ops.pop();
+                }
+            }
+        }
+        ops
     }
 }
 
