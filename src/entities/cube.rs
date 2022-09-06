@@ -12,33 +12,7 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn from(lines: &Vec<&str>) -> Self {
-        let up = Face::from(&lines[0..3].to_vec());
-        let front = Face::from(
-            &lines[3..6]
-                .iter()
-                .map(|&line| &line[..3])
-                .collect::<Vec<_>>(),
-        );
-        let right = Face::from(
-            &lines[3..6]
-                .iter()
-                .map(|&line| &line[3..6])
-                .collect::<Vec<_>>(),
-        );
-        let back = Face::from(
-            &lines[3..6]
-                .iter()
-                .map(|&line| &line[6..9])
-                .collect::<Vec<_>>(),
-        );
-        let left = Face::from(
-            &lines[3..6]
-                .iter()
-                .map(|&line| &line[9..])
-                .collect::<Vec<_>>(),
-        );
-        let down = Face::from(&lines[6..9].to_vec());
+    pub fn new(front: Face, back: Face, up: Face, down: Face, left: Face, right: Face) -> Self {
         Self {
             front,
             back,
@@ -48,21 +22,41 @@ impl Cube {
             right,
         }
     }
-    pub fn read() -> Self {
-        let stdin = std::io::stdin();
-        let mut buffer = vec![];
-        while buffer.len() < 9 {
-            let mut line = String::new();
-            while line.is_empty() {
-                let _ = stdin.read_line(&mut line);
-                line = line.trim().to_string();
-                if line.starts_with('#') {
-                    line.clear();
-                }
-            }
-            buffer.push(line.clone());
+    pub fn from(lines: Vec<Vec<Color>>) -> Self {
+        let up = Face::from(lines[0..3].to_vec());
+        let front = Face::from(
+            lines[3..6]
+                .iter()
+                .map(|line| line[..3].to_vec())
+                .collect::<Vec<_>>(),
+        );
+        let right = Face::from(
+            lines[3..6]
+                .iter()
+                .map(|line| line[3..6].to_vec())
+                .collect::<Vec<_>>(),
+        );
+        let back = Face::from(
+            lines[3..6]
+                .iter()
+                .map(|line| line[6..9].to_vec())
+                .collect::<Vec<_>>(),
+        );
+        let left = Face::from(
+            lines[3..6]
+                .iter()
+                .map(|line| line[9..].to_vec())
+                .collect::<Vec<_>>(),
+        );
+        let down = Face::from(lines[6..9].to_vec());
+        Self {
+            front,
+            back,
+            up,
+            down,
+            left,
+            right,
         }
-        Cube::from(&buffer.iter().map(|s| s.as_str()).collect())
     }
     pub fn matched(&self, other: &Cube) -> bool {
         self.up.matched(&other.up)
@@ -84,14 +78,24 @@ impl Cube {
 
 impl std::fmt::Display for Cube {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "{}", self.up)?;
+        writeln!(f, "{{")?;
         for i in 0..3 {
-            write!(f, "{}", self.front.show(i))?;
-            write!(f, "{}", self.right.show(i))?;
-            write!(f, "{}", self.back.show(i))?;
-            writeln!(f, "{}", self.left.show(i))?;
+            writeln!(f, "  {}", self.up.show(i))?;
         }
-        write!(f, "{}", self.down)
+        for i in 0..3 {
+            writeln!(
+                f,
+                "  {} {} {} {}",
+                self.front.show(i),
+                self.right.show(i),
+                self.back.show(i),
+                self.left.show(i),
+            )?;
+        }
+        for i in 0..3 {
+            writeln!(f, "  {}", self.down.show(i))?;
+        }
+        write!(f, "}}")
     }
 }
 
@@ -356,120 +360,120 @@ impl Cube {
 
 #[cfg(test)]
 mod test_cube {
-    use crate::entities::Color;
-    use crate::{Cube, Operation, Ops};
+    use crate::entities::*;
+    use crate::{cube, Cube, Operation, Ops};
     use Operation::*;
 
     #[test]
     fn test_simple_operation() {
-        let solved_cube = Cube::from(&vec![
-            "YYY",
-            "YYY",
-            "YYY",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let solved_cube = cube![
+            Y Y Y;
+            Y Y Y;
+            Y Y Y;
+            R R R G G G O O O B B B;
+            R R R G G G O O O B B B;
+            R R R G G G O O O B B B;
+            W W W;
+            W W W;
+            W W W;
+        ];
         {
             let mut c = solved_cube.clone();
             c.apply(Front(true));
-            let d = Cube::from(&vec![
-                "YYY",
-                "YYY",
-                "BBB",
-                "RRRYGGOOOBBW",
-                "RRRYGGOOOBBW",
-                "RRRYGGOOOBBW",
-                "GGG",
-                "WWW",
-                "WWW",
-            ]);
+            let d = cube![
+                Y Y Y;
+                Y Y Y;
+                B B B;
+                R R R Y G G O O O B B W;
+                R R R Y G G O O O B B W;
+                R R R Y G G O O O B B W;
+                G G G;
+                W W W;
+                W W W;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = solved_cube.clone();
             c.apply(Back(true));
-            let d = Cube::from(&vec![
-                "GGG",
-                "YYY",
-                "YYY",
-                "RRRGGWOOOYBB",
-                "RRRGGWOOOYBB",
-                "RRRGGWOOOYBB",
-                "WWW",
-                "WWW",
-                "BBB",
-            ]);
+            let d = cube![
+                G G G ;
+                Y Y Y ;
+                Y Y Y ;
+                R R R G G W O O O Y B B ;
+                R R R G G W O O O Y B B ;
+                R R R G G W O O O Y B B ;
+                W W W ;
+                W W W ;
+                B B B ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = solved_cube.clone();
             c.apply(Right(true));
             c.apply(Back(true));
-            let d = Cube::from(&vec![
-                "GGG",
-                "YYR",
-                "YYR",
-                "RRWGGOYYYRBB",
-                "RRWGGWOOOYBB",
-                "RRWGGWOOOYBB",
-                "WWO",
-                "WWO",
-                "BBB",
-            ]);
+            let d = cube![
+                G G G ;
+                Y Y R ;
+                Y Y R ;
+                R R W G G O Y Y Y R B B ;
+                R R W G G W O O O Y B B ;
+                R R W G G W O O O Y B B ;
+                W W O ;
+                W W O ;
+                B B B ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = solved_cube.clone();
             c.apply(Front(true));
             c.apply(Left(true));
-            let d = Cube::from(&vec![
-                "OYY",
-                "OYY",
-                "OBB",
-                "YRRYGGOOWBBB",
-                "YRRYGGOOWBBB",
-                "BRRYGGOOGWWW",
-                "RGG",
-                "RWW",
-                "RWW",
-            ]);
+            let d = cube![
+                O Y Y ;
+                O Y Y ;
+                O B B ;
+                Y R R Y G G O O W B B B ;
+                Y R R Y G G O O W B B B ;
+                B R R Y G G O O G W W W ;
+                R G G ;
+                R W W ;
+                R W W ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = solved_cube.clone();
             c.apply(Left(true));
             c.apply(Down(true));
-            let d = Cube::from(&vec![
-                "OYY",
-                "OYY",
-                "OYY",
-                "YRRGGGOOWBBB",
-                "YRRGGGOOWBBB",
-                "BBBYRRGGGOOW",
-                "RRR",
-                "WWW",
-                "WWW",
-            ]);
+            let d = cube![
+                O Y Y ;
+                O Y Y ;
+                O Y Y ;
+                Y R R G G G O O W B B B ;
+                Y R R G G G O O W B B B ;
+                B B B Y R R G G G O O W ;
+                R R R ;
+                W W W ;
+                W W W ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = solved_cube.clone();
             c.apply(Z(true));
-            let d = Cube::from(&vec![
-                "BBB",
-                "BBB",
-                "BBB",
-                "RRRYYYOOOWWW",
-                "RRRYYYOOOWWW",
-                "RRRYYYOOOWWW",
-                "GGG",
-                "GGG",
-                "GGG",
-            ]);
+            let d = cube![
+                B B B ;
+                B B B ;
+                B B B ;
+                R R R Y Y Y O O O W W W ;
+                R R R Y Y Y O O O W W W ;
+                R R R Y Y Y O O O W W W ;
+                G G G ;
+                G G G ;
+                G G G ;
+            ];
             assert_eq!(c, d);
         }
         {
@@ -477,17 +481,17 @@ mod test_cube {
             c.apply(Z(true));
             c.apply(X(true));
             c.apply(Z(false));
-            let d = Cube::from(&vec![
-                "YYY",
-                "YYY",
-                "YYY",
-                "GGGOOOBBBRRR",
-                "GGGOOOBBBRRR",
-                "GGGOOOBBBRRR",
-                "WWW",
-                "WWW",
-                "WWW",
-            ]);
+            let d = cube![
+                Y Y Y ;
+                Y Y Y ;
+                Y Y Y ;
+                G G G O O O B B B R R R ;
+                G G G O O O B B B R R R ;
+                G G G O O O B B B R R R ;
+                W W W ;
+                W W W ;
+                W W W ;
+            ];
             assert_eq!(c, d);
         }
     }
@@ -495,80 +499,80 @@ mod test_cube {
     #[test]
     fn test_one_operation() {
         // Scrambled with M'U'M'U'F
-        let c = Cube::from(&vec![
-            "YRY",
-            "BWW",
-            "BBG",
-            "RROYOBRWRGYW",
-            "OOYRGGOROBBY",
-            "RROYGGOYOBBW",
-            "GGB",
-            "WYW",
-            "WGW",
-        ]);
+        let c = cube![
+            Y R Y ;
+            B W W ;
+            B B G ;
+            R R O Y O B R W R G Y W ;
+            O O Y R G G O R O B B Y ;
+            R R O Y G G O Y O B B W ;
+            G G B ;
+            W Y W ;
+            W G W ;
+        ];
         {
             let mut c = c.clone();
             c.apply(X(true));
-            let d = Cube::from(&vec![
-                "RRO",
-                "OOY",
-                "RRO",
-                "GGBYRYGBBWYW",
-                "WYWGGOWWBYBB",
-                "WGWGGBYRYGBB",
-                "OYO",
-                "ORO",
-                "RWR",
-            ]);
+            let d = cube![
+                R R O ;
+                O O Y ;
+                R R O ;
+                G G B Y R Y G B B W Y W ;
+                W Y W G G O W W B Y B B ;
+                W G W G G B Y R Y G B B ;
+                O Y O ;
+                O R O ;
+                R W R ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = c.clone();
             c.apply(Y(true));
-            let d = Cube::from(&vec![
-                "BBY",
-                "BWR",
-                "GWY",
-                "YOBRWRGYWRRO",
-                "RGGOROBBYOOY",
-                "YGGOYOBBWRRO",
-                "BWW",
-                "GYG",
-                "GWW",
-            ]);
+            let d = cube![
+                B B Y ;
+                B W R ;
+                G W Y ;
+                Y O B R W R G Y W R R O ;
+                R G G O R O B B Y O O Y ;
+                Y G G O Y O B B W R R O ;
+                B W W ;
+                G Y G ;
+                G W W ;
+            ];
             assert_eq!(c, d);
         }
         {
             let mut c = c.clone();
             c.apply(Z(true));
-            let d = Cube::from(&vec![
-                "BBG",
-                "BBY",
-                "WYW",
-                "RORBBYROOWWG",
-                "RORBWRWRYGYG",
-                "OYOGWYROOWWB",
-                "YRY",
-                "GGO",
-                "GGB",
-            ]);
+            let d = cube![
+                B B G ;
+                B B Y ;
+                W Y W ;
+                R O R B B Y R O O W W G ;
+                R O R B W R W R Y G Y G ;
+                O Y O G W Y R O O W W B ;
+                Y R Y ;
+                G G O ;
+                G G B ;
+            ];
             assert_eq!(c, d);
         }
     }
 
     #[test]
     fn test_canceling() {
-        let solved_cube = Cube::from(&vec![
-            "YYY",
-            "YYY",
-            "YYY",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let solved_cube = cube![
+            Y Y Y ;
+            Y Y Y ;
+            Y Y Y ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            W W W ;
+            W W W ;
+            W W W ;
+        ];
         {
             let u2 = Ops::new(vec![Up(true), Up(true)]);
             let u2_prime = Ops::new(vec![Up(false), Up(false)]);
@@ -594,17 +598,17 @@ mod test_cube {
 
     #[test]
     fn test_pll() {
-        let c = Cube::from(&vec![
-            "YYY",
-            "YYY",
-            "YYY",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let c = cube![
+            Y Y Y ;
+            Y Y Y ;
+            Y Y Y ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            W W W ;
+            W W W ;
+            W W W ;
+        ];
         {
             // J-perm
             let mut c = c.clone();
@@ -623,17 +627,17 @@ mod test_cube {
             c.apply(Up(false));
             c.apply(Right(false));
             c.apply(Up(false));
-            let d = Cube::from(&vec![
-                "YYY",
-                "YYY",
-                "YYY",
-                "RGGORRGOOBBB",
-                "RRRGGGOOOBBB",
-                "RRRGGGOOOBBB",
-                "WWW",
-                "WWW",
-                "WWW",
-            ]);
+            let d = cube![
+                Y Y Y ;
+                Y Y Y ;
+                Y Y Y ;
+                R G G O R R G O O B B B ;
+                R R R G G G O O O B B B ;
+                R R R G G G O O O B B B ;
+                W W W ;
+                W W W ;
+                W W W ;
+            ];
             assert!(c.matched(&d));
         }
         {
@@ -652,33 +656,33 @@ mod test_cube {
             c.apply(Middle(false));
             c.apply(Middle(false));
             c.apply(Up(true));
-            let d = Cube::from(&vec![
-                "YYY",
-                "YYY",
-                "YYY",
-                "RGRGRGOBOBOB",
-                "RRRGGGOOOBBB",
-                "RRRGGGOOOBBB",
-                "WWW",
-                "WWW",
-                "WWW",
-            ]);
+            let d = cube![
+                Y Y Y ;
+                Y Y Y ;
+                Y Y Y ;
+                R G R G R G O B O B O B ;
+                R R R G G G O O O B B B ;
+                R R R G G G O O O B B B ;
+                W W W ;
+                W W W ;
+                W W W ;
+            ];
             assert!(c.matched(&d));
         }
     }
     #[test]
     fn test_f2l() {
-        let mut c = Cube::from(&vec![
-            "***",
-            "***",
-            "***",
-            "************",
-            "RRGRGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let mut c = cube![
+            * * * ;
+            * * * ;
+            * * * ;
+            * * * * * * * * * * * * ;
+            R R G R G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            W W W ;
+            W W W ;
+            W W W ;
+        ];
         c.apply(Right(false));
         c.apply(Front(true));
         c.apply(Right(true));
@@ -695,33 +699,33 @@ mod test_cube {
         c.apply(Right(true));
         c.apply(Up(false));
         c.apply(Right(false));
-        let d = Cube::from(&vec![
-            "***",
-            "***",
-            "***",
-            "************",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let d = cube![
+            * * * ;
+            * * * ;
+            * * * ;
+            * * * * * * * * * * * * ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            W W W ;
+            W W W ;
+            W W W ;
+        ];
         assert!(c.matched(&d));
     }
 
     #[test]
     fn test_count() {
-        let c = Cube::from(&vec![
-            "***",
-            "*.*",
-            "***",
-            "************",
-            "RRRGGGOOOBBB",
-            "RRRGGGOOOBBB",
-            "WWW",
-            "WWW",
-            "WWW",
-        ]);
+        let c = cube![
+            * * * ;
+            * . * ;
+            * * * ;
+            * * * * * * * * * * * * ;
+            R R R G G G O O O B B B ;
+            R R R G G G O O O B B B ;
+            W W W ;
+            W W W ;
+            W W W ;
+        ];
         let count = c.count();
         assert_eq!(count[&Color::Red], 6);
         assert_eq!(count[&Color::Green], 6);

@@ -8,3 +8,4 @@ structopt = { version = "0.3", default-features = false }
 log = "0.4"
 env_logger = "*"
 serde_json = "*"
+nom = "7"

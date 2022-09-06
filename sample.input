@@ -1,19 +1,28 @@
-YYY
-YYY
-YYY
-GGGOOOBBBRRR
-RRRGGGOOOBBB
-OOOBBBRRRGGG
-WWW
-WWW
-WWW
+# Sample input file.
+# <- Comments begin with #.
 
-YYY
-YYY
-YYY
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
+# Initial state. This is solved.
+Init {
+  YYY     #
+  YYY     # Up-face
+  YYY     #
+  GGG OOO BBB RRR  #
+  RRR GGG OOO BBB  # Front, Right, Back, Left-faces
+  OOO BBB RRR GGG  #
+  WWW  #
+  WWW  # Down-face
+  WWW  #
+}
+
+# Goal state. This is optional, and the standard form If the goal is omitted, the canonical form (this goal) is used.
+Goal {
+  YYY
+  YYY
+  YYY
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  WWW
+  WWW
+  WWW
+}
