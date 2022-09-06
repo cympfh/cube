@@ -1,20 +1,24 @@
-# Strong f2l/3
-...
-.Y.
-...
-............
-BBRBRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
-
-...
-.Y.
-...
-............
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
+# Strong F2L
+# cube -FRU < tests/f2l/38
+Init {
+  ...
+  .Y.
+  ...
+  ............
+  BBRBRRGGGOOO
+  BBBRRRGGGOOO
+  WWW
+  WWW
+  WWW
+}
+Goal {
+  ...
+  .Y.
+  ...
+  ............
+  BBBRRRGGGOOO
+  BBBRRRGGGOOO
+  WWW
+  WWW
+  WWW
+}

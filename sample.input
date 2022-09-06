@@ -1,5 +1,11 @@
 # Sample input file.
+
+#
 # <- Comments begin with #.
+#
+
+// this style is also ok.
+; ok.
 
 # Initial state. This is solved.
 Init {
@@ -14,7 +20,8 @@ Init {
   WWW  #
 }
 
-# Goal state. This is optional, and the standard form If the goal is omitted, the canonical form (this goal) is used.
+# Goal state.
+# This is optional, and if omitted, the standard form (this form) is used as a goal.
 Goal {
   YYY
   YYY

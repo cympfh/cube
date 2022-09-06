@@ -1,40 +1,82 @@
 # cube
-cube solver
+
+A 3x3x3 cube solver
 
 ## Usage
 
 ```bash
-$ cargo run -- --help
+# Install `cube` command
+$ cargo install --path .
 
-# Solving with U, D and F
-$ cargo run -- -UDF < sample.input
+# Samples
+$ cat sample.input
+$ cat sample2.input
 
-Init:
-YYY
-YYY
-YYY
-GGGOOOBBBRRR
-RRRGGGOOOBBB
-OOOBBBRRRGGG
-WWW
-WWW
-WWW
-
-Goal:
-YYY
-YYY
-YYY
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
-
-Solved: DDU'
+$ cube -UDF < sample.input
+[2022-09-06T06:24:39Z INFO ] Solution: DDU'
+{"ok":true,"solutions":[{"algorithm":"DDU'","length":3}]}
 ```
 
 ## Format
+
+### Example
+
+![](https://user-images.githubusercontent.com/2749629/188441799-0f08adb8-709a-47ee-8c97-4039821ebeb1.png)
+
+Solve left (**initial** state) into right (**goal** state).
+
+```dot
+Init {
+  YYY
+  YYY
+  YYY
+  GGG OOO BBB RRR
+  RRR GGG OOO BBB
+  OOO BBB RRR GGG
+  WWW
+  WWW
+  WWW
+}
+
+Goal {
+  YYY
+  YYY
+  YYY
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  WWW
+  WWW
+  WWW
+}
+```
+
+You can pass **scramble** insteade of initial state.
+
+```dot
+Scramble {
+  U D2
+}
+
+Goal {
+  YYY
+  YYY
+  YYY
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  WWW
+  WWW
+  WWW
+}
+```
+
+`Goal { ... }` can be omitted.
+The default is standard form, up-face is yellow and front-face is red.
+
+![](https://user-images.githubusercontent.com/2749629/188440065-7c9c71d1-5b34-4899-8968-ecabee745863.png)
+
+Standard form.
 
 ### Colors
 
@@ -47,67 +89,41 @@ Solved: DDU'
 - `.`: Other Color (`.` matches to `.`)
 - `*`: Wildcard (Any colors matching)
 
-### A Face
+### Operations
 
-A face is a matrix of 3x3 colors.
+- `U D F B L R`, clockwise
+- `U' D' F' B' L' R'`, counter-clockwise
+- `U2 D2 F2 B2 L2 R2`, 180 rotate
+- `u d f b l r`, double-layers rotation
+  - `u' d' f' b' l' r'`
+  - `u2 d2 f2 b2 l2 r2`
+  - `Uw Dw Fw Bw Lw Rw`, also ok
+- `M S E` `M' S' E'`
+- `x y z`, (r) (u) (f)
 
-Example:
+### BNF Spec
 
-```
-WBW
-WYB
-ORG
-```
+```prolog
+<Input> ::= <Entry> | <Entry> <Input>
 
-### A Cube
+<Entry> ::= Init { <Cube> }
+          | Goal { <Cube> }
+          | Scramble { <Operations> }
 
-A cube is written as a cube net.
+<Cube> ::= <Color> * 54
 
-```
-(U-Face)
-(F-Face)(R-Face)(B-Face)(L-Face)
-(D-Face)
-```
-
-For example, the following is the solved state.
-
-```
-YYY
-YYY
-YYY
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
+<Operations> ::= <Op> | <Op> <Operations>
 ```
 
-### Input Format
+White-spaces and new-lines are all ignored.
+And comments can put anywhere.
 
-Solver `cube` read an initial state and  a goal state.
-The 2 states are separated with an empty line.
+```prolog
+<Comment> ::= <CommentMarker> <LineString> <Newline>
 
+<CommentMarker> ::= "#" | "//" | ";"
 
+<LineString> ::= <any-char> | <any-char> <LineString>
+
+<Newline> ::= "\r" | "\n"
 ```
-YYY
-YYY
-YYY
-GGGOOOBBBRRR
-RRRGGGOOOBBB
-OOOBBBRRRGGG
-WWW
-WWW
-WWW
-
-YYY
-YYY
-YYY
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
-```
-

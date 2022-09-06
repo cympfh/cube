@@ -1,21 +1,3 @@
-# DDU' + (xyz)
-# cargo run -- -UD --max-depth 3 < tests/ddu
-YYY
-YYY
-YYY
-OOOBBBRRRGGG
-GGGOOOBBBRRR
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
-
-YYY
-YYY
-YYY
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
+Scramble {
+  DDU'
+}

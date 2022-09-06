@@ -1,22 +1,27 @@
 # Step1: White Cross
-# cargo run --release -- -v -FRUDLB < tests/cfop/1
-# Solved: FL'B'DR'D
-WYW
-BYB
-GOG
-YWYRYBOOGROO
-RRRYGWROWGBB
-BGWBBWGGRBOY
-OYR
-GWW
-YRO
+# cube -FRUDLB < tests/cfop/1
+# says: FL'B'DR'D
 
-***
-***
-***
-************
-*R**G**O**B*
-*R**G**O**B*
-*W*
-WWW
-*W*
+Init {
+  WYW
+  BYB
+  GOG
+  YWYRYBOOGROO
+  RRRYGWROWGBB
+  BGWBBWGGRBOY
+  OYR
+  GWW
+  YRO
+}
+
+Goal {
+  ***
+  ***
+  ***
+  ************
+  *R**G**O**B*
+  *R**G**O**B*
+  *W*
+  WWW
+  *W*
+}

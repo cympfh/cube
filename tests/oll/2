@@ -1,19 +1,22 @@
-Y.Y
-YYY
-Y.Y
-.Y.....Y....
-GGGOOOBBBRRR
-GGGOOOBBBRRR
-WWW
-WWW
-WWW
-
-YYY
-YYY
-YYY
-............
-GGGOOOBBBRRR
-GGGOOOBBBRRR
-WWW
-WWW
-WWW
+Init {
+  Y.Y
+  YYY
+  Y.Y
+  .Y.....Y....
+  GGGOOOBBBRRR
+  GGGOOOBBBRRR
+  WWW
+  WWW
+  WWW
+}
+Goal {
+  YYY
+  YYY
+  YYY
+  ............
+  GGGOOOBBBRRR
+  GGGOOOBBBRRR
+  WWW
+  WWW
+  WWW
+}
