@@ -1,21 +1,26 @@
 # Dot Pattern
-# cargo run -- -v -DURM --max-depth 6 < tests/dot
-WWW
-WYW
-WWW
-************
-*B**O**G**R*
-************
-YYY
-YWY
-YYY
+# cube -DRUM < tests/dot
 
-WWW
-WWW
-WWW
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-YYY
-YYY
-YYY
+Init {
+  YYY
+  YWY
+  YYY
+  *** *** *** ***
+  *B* *O* *G* *R*
+  *** *** *** ***
+  WWW
+  WYW
+  WWW
+}
+
+Goal{
+  YYY
+  YYY
+  YYY
+  RRRGGGOOOBBB
+  RRRGGGOOOBBB
+  RRRGGGOOOBBB
+  WWW
+  WWW
+  WWW
+}

@@ -1,6 +1,6 @@
 [package]
 name = "cube"
-version = "0.3.0"
+version = "0.4.0"
 edition = "2021"
 
 [dependencies]
@@ -8,3 +8,4 @@ structopt = { version = "0.3", default-features = false }
 log = "0.4"
 env_logger = "*"
 serde_json = "*"
+nom = "7"

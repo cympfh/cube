@@ -1,21 +1,28 @@
 # H-perm
-# cargo run --release -- -v -FRUM < tests/pll/h
-YYY
-YYY
-YYY
-BGBRORGBGORO
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
+# cube -UM < tests/pll/h
+# or
+# cube -FRU < tests/pll/h
 
-YYY
-YYY
-YYY
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
+Init {
+  YYY
+  YYY
+  YYY
+  BGBRORGBGORO
+  BBBRRRGGGOOO
+  BBBRRRGGGOOO
+  WWW
+  WWW
+  WWW
+}
+
+Goal {
+  YYY
+  YYY
+  YYY
+  BBBRRRGGGOOO
+  BBBRRRGGGOOO
+  BBBRRRGGGOOO
+  WWW
+  WWW
+  WWW
+}

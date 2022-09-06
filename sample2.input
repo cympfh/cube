@@ -1,0 +1,23 @@
+# Initial state can be specified as scramble.
+#
+# Try:
+#    cube --roux < sample2.input
+
+# Init is the scrambled from the `Goal`.
+Scramble {
+  U F' R2 U' B R U' L2 F R2 F2 U' F2 U2 F2 L2 D' B2 U R2 U
+}
+
+# Goal state.
+# This is optional and if this is omitted, the standard form is used (this is the standard form).
+Goal {
+  YYY
+  YYY
+  YYY
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  RRR GGG OOO BBB
+  WWW
+  WWW
+  WWW
+}

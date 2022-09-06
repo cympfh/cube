@@ -1,21 +1,28 @@
 # No Operation required.
+# cube -RUFLDB < tests/nop
+# says `(nop)`, that means "no operations".
 
-YYY
-YYY
-YYY
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
+Init {
+  YYY
+  YYY
+  YYY
+  BBB RRR GGG OOO
+  BBB RRR GGG OOO
+  BBB RRR GGG OOO
+  WWW
+  WWW
+  WWW
+}
 
-YYY
-YYY
-YYY
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-BBBRRRGGGOOO
-WWW
-WWW
-WWW
+// Init == Goal
+Goal {
+  YYY
+  YYY
+  YYY
+  BBB RRR GGG OOO
+  BBB RRR GGG OOO
+  BBB RRR GGG OOO
+  WWW
+  WWW
+  WWW
+}

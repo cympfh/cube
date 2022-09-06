@@ -1,20 +1,22 @@
-...
-.Y.
-..W
-..GR........
-RRGRGGOOOBBB
-RR..GGOOOBBB
-WW.
-WWW
-WWW
-
-...
-.Y.
-...
-............
-RRRGGGOOOBBB
-RRRGGGOOOBBB
-WWW
-WWW
-WWW
-
+Init {
+  ...
+  .Y.
+  ..W
+  ..GR........
+  RRGRGGOOOBBB
+  RR..GGOOOBBB
+  WW.
+  WWW
+  WWW
+}
+Goal {
+  ...
+  .Y.
+  ...
+  ............
+  RRRGGGOOOBBB
+  RRRGGGOOOBBB
+  WWW
+  WWW
+  WWW
+}

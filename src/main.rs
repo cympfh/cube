@@ -1,9 +1,11 @@
 mod entities;
+mod read;
 mod solver;
 mod util;
 
 use crate::entities::*;
 use log::{error, info, warn};
+use read::read;
 use serde_json::json;
 use std::env;
 use structopt::StructOpt;
@@ -174,8 +176,13 @@ fn main() {
         allowed_ops.push(Z(false));
     }
 
-    let cube = Cube::read();
-    info!("Init:\n{}", &cube);
+    let (cube, goal) = read();
+    info!("Init\n{}", &cube);
+    info!("Goal\n{}", &goal);
+    if let Err(col) = validation(&cube, &goal) {
+        error!("Validation Failed. Check number of color:{}.", col);
+        return;
+    }
 
     if opt.roux {
         if let Some(alg) = solver::roux(&cube, opt.verbose) {
@@ -194,13 +201,6 @@ fn main() {
             info!("No Solution");
             println!("{}", json!({ "ok": false, "solution": {} }));
         }
-        return;
-    }
-
-    let goal = Cube::read();
-    info!("Goal:\n{}", &goal);
-    if let Err(col) = validation(&cube, &goal) {
-        error!("Validation Failed. Check number of color:{}.", col);
         return;
     }
 

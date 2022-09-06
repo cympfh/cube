@@ -1,23 +1,27 @@
 # Step2: F2L [2/4]
-# cargo run --release -- -v -FRUDL --max-depth 8 < tests/cfop/3
-# Solved: FU'RU'R'F'R'U'R
-BBG
-GYY
-OBB
-WOOWBOYRWROG
-YRRGGRYOOYBG
-BRRGGRYOYRBY
-OWW
-WWW
-BWG
+# cube -FRUDL --max-depth 8 < tests/cfop/3
+# says: FU'RU'R'F'R'U'R
 
-***
-***
-***
-************
-*RRGGGOO**B*
-*RRGGGOO**B*
-*WW
-WWW
-*WW
+Input {
+  BBG
+  GYY
+  OBB
+  WOOWBOYRWROG
+  YRRGGRYOOYBG
+  BRRGGRYOYRBY
+  OWW
+  WWW
+  BWG
+}
 
+Goal {
+  ***
+  ***
+  ***
+  ************
+  *RRGGGOO**B*
+  *RRGGGOO**B*
+  *WW
+  WWW
+  *WW
+}

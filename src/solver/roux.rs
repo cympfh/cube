@@ -1,3 +1,4 @@
+use crate::cube;
 use crate::entities::*;
 use crate::solver::search;
 use log::info;
@@ -17,31 +18,33 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     let mut cube: Cube = cube.clone();
     let mut algorithm = Ops::default();
 
+    use Operation::*;
+
     info!("FB/1");
-    let subgoal = Cube::from(&vec![
-        "***",
-        "***",
-        "***",
-        "************",
-        "R*********BB",
-        "R*********BB",
-        "W**",
-        "W**",
-        "***",
-    ]);
+    let subgoal = cube![
+        * * * ;
+        * * * ;
+        * * * ;
+        * * * * * * * * * * * * ;
+        R * * * * * * * * * B B ;
+        R * * * * * * * * * B B ;
+        W * * ;
+        W * * ;
+        * * * ;
+    ];
     let allowed_ops = vec![
-        Operation::Front(true),
-        Operation::Front(false),
-        Operation::Back(true),
-        Operation::Back(false),
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Down(true),
-        Operation::Down(false),
-        Operation::Right(true),
-        Operation::Right(false),
-        Operation::Left(true),
-        Operation::Left(false),
+        Front(true),
+        Front(false),
+        Back(true),
+        Back(false),
+        Up(true),
+        Up(false),
+        Down(true),
+        Down(false),
+        Right(true),
+        Right(false),
+        Left(true),
+        Left(false),
     ];
     match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
@@ -54,26 +57,26 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     info!("FB/2");
-    let subgoal = Cube::from(&vec![
-        "***",
-        "***",
-        "***",
-        "************",
-        "R*******OBBB",
-        "R*******OBBB",
-        "W**",
-        "W**",
-        "W**",
-    ]);
+    let subgoal = cube![
+        * * * ;
+        * * * ;
+        * * * ;
+        * * * * * * * * * * * * ;
+        R * * * * * * * O B B B ;
+        R * * * * * * * O B B B ;
+        W * * ;
+        W * * ;
+        W * * ;
+    ];
     let allowed_ops = vec![
-        Operation::Back(true),
-        Operation::Back(false),
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Right(true),
-        Operation::Right(false),
-        Operation::RightDouble(true),
-        Operation::RightDouble(false),
+        Back(true),
+        Back(false),
+        Up(true),
+        Up(false),
+        Right(true),
+        Right(false),
+        RightDouble(true),
+        RightDouble(false),
     ];
     match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
@@ -86,26 +89,26 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     info!("SB/1");
-    let subgoal = Cube::from(&vec![
-        "***",
-        "***",
-        "***",
-        "************",
-        "R*RGG***OBBB",
-        "R*RGG***OBBB",
-        "W*W",
-        "W*W",
-        "W**",
-    ]);
+    let subgoal = cube![
+        * * * ;
+        * * * ;
+        * * * ;
+        * * * * * * * * * * * * ;
+        R * R G G * * * O B B B ;
+        R * R G G * * * O B B B ;
+        W * W ;
+        W * W ;
+        W * * ;
+    ];
     let allowed_ops = vec![
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Right(true),
-        Operation::Right(false),
-        Operation::RightDouble(true),
-        Operation::RightDouble(false),
-        Operation::Middle(true),
-        Operation::Middle(false),
+        Up(true),
+        Up(false),
+        Right(true),
+        Right(false),
+        RightDouble(true),
+        RightDouble(false),
+        Middle(true),
+        Middle(false),
     ];
     match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
@@ -118,26 +121,26 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     info!("SB/2");
-    let subgoal = Cube::from(&vec![
-        "***",
-        "***",
-        "***",
-        "************",
-        "R*RGGGO*OBBB",
-        "R*RGGGO*OBBB",
-        "W*W",
-        "W*W",
-        "W*W",
-    ]);
+    let subgoal = cube![
+        * * * ;
+        * * * ;
+        * * * ;
+        * * * * * * * * * * * * ;
+        R * R G G G O * O B B B ;
+        R * R G G G O * O B B B ;
+        W * W ;
+        W * W ;
+        W * W ;
+    ];
     let allowed_ops = vec![
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Right(true),
-        Operation::Right(false),
-        Operation::RightDouble(true),
-        Operation::RightDouble(false),
-        Operation::Middle(true),
-        Operation::Middle(false),
+        Up(true),
+        Up(false),
+        Right(true),
+        Right(false),
+        RightDouble(true),
+        RightDouble(false),
+        Middle(true),
+        Middle(false),
     ];
     match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
@@ -168,24 +171,24 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     cm.right[(0, 1)] = Color::Wildcard;
     cm.left[(0, 1)] = Color::Wildcard;
 
-    let subgoal = Cube::from(&vec![
-        "YYY",
-        "YYY",
-        "YYY",
-        "RRRGGGOOOBBB",
-        "RRRGGGOOOBBB",
-        "RRRGGGOOOBBB",
-        "WWW",
-        "WWW",
-        "WWW",
-    ]);
+    let subgoal = cube![
+        Y Y Y ;
+        Y Y Y ;
+        Y Y Y ;
+        R R R G G G O O O B B B ;
+        R R R G G G O O O B B B ;
+        R R R G G G O O O B B B ;
+        W W W ;
+        W W W ;
+        W W W ;
+    ];
     let allowed_ops = vec![
-        Operation::Front(true),
-        Operation::Front(false),
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Right(true),
-        Operation::Right(false),
+        Front(true),
+        Front(false),
+        Up(true),
+        Up(false),
+        Right(true),
+        Right(false),
     ];
     match search_one(&cm, &subgoal, allowed_ops, 10, verbose) {
         Some(alg) => {
@@ -198,22 +201,22 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     // info!("LSE/UL&UR");
-    // let subgoal = Cube::from(&vec![
-    //     "Y*Y",
-    //     "Y*Y",
-    //     "Y*Y",
-    //     "R*RGGGO*OBBB",
-    //     "R*RGGGO*OBBB",
-    //     "R*RGGGO*OBBB",
-    //     "W*W",
-    //     "W*W",
-    //     "W*W",
-    // ]);
+    // let subgoal = cube![
+    //     Y * Y ;
+    //     Y * Y ;
+    //     Y * Y ;
+    //     R * R G G G O * O B B B ;
+    //     R * R G G G O * O B B B ;
+    //     R * R G G G O * O B B B ;
+    //     W * W ;
+    //     W * W ;
+    //     W * W ;
+    // ];
     // let allowed_ops = vec![
-    //     Operation::Up(true),
-    //     Operation::Up(false),
-    //     Operation::Middle(true),
-    //     Operation::Middle(false),
+    //     Up(true),
+    //     Up(false),
+    //     Middle(true),
+    //     Middle(false),
     // ];
     // match search_one(&cube, &subgoal, allowed_ops, 12, verbose) {
     //     Some(alg) => {
@@ -226,23 +229,18 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     // }
 
     info!("LSE");
-    let subgoal = Cube::from(&vec![
-        "YYY",
-        "YYY",
-        "YYY",
-        "RRRGGGOOOBBB",
-        "RRRGGGOOOBBB",
-        "RRRGGGOOOBBB",
-        "WWW",
-        "WWW",
-        "WWW",
-    ]);
-    let allowed_ops = vec![
-        Operation::Up(true),
-        Operation::Up(false),
-        Operation::Middle(true),
-        Operation::Middle(false),
+    let subgoal = cube![
+        Y Y Y ;
+        Y Y Y ;
+        Y Y Y ;
+        R R R G G G O O O B B B ;
+        R R R G G G O O O B B B ;
+        R R R G G G O O O B B B ;
+        W W W ;
+        W W W ;
+        W W W ;
     ];
+    let allowed_ops = vec![Up(true), Up(false), Middle(true), Middle(false)];
     match search_one(&cube, &subgoal, allowed_ops, 12, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);

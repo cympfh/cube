@@ -10,22 +10,23 @@ pub enum Color {
     Wildcard,
 }
 
-impl Color {
-    pub fn from(c: char) -> Self {
-        use Color::*;
-        match c.to_lowercase().next().unwrap_or('_') {
-            'w' => White,
-            'y' => Yellow,
-            'r' => Red,
-            'o' => Orange,
-            'b' => Blue,
-            'g' => Green,
-            '.' => Other,
-            '*' => Wildcard,
-            _ => panic!("Unknown color: {}", c),
-        }
-    }
-}
+// TODO 不要なはず
+// impl Color {
+//     pub fn from(c: char) -> Self {
+//         use Color::*;
+//         match c.to_lowercase().next().unwrap_or('_') {
+//             'w' => White,
+//             'y' => Yellow,
+//             'r' => Red,
+//             'o' => Orange,
+//             'b' => Blue,
+//             'g' => Green,
+//             '.' => Other,
+//             '*' => Wildcard,
+//             _ => panic!("Unknown color: {}", c),
+//         }
+//     }
+// }
 
 impl std::fmt::Display for Color {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
