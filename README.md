@@ -12,9 +12,13 @@ $ cargo install --path .
 $ cat sample.input
 $ cat sample2.input
 
+# Solving with U, D and F operations
 $ cube -UDF < sample.input
 [2022-09-06T06:24:39Z INFO ] Solution: DDU'
 {"ok":true,"solutions":[{"algorithm":"DDU'","length":3}]}
+
+# Solving with Roux Method
+$ cube --roux < sample2.input
 ```
 
 ## Format

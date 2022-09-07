@@ -154,33 +154,35 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("CMLL");
     let mut cm = cube.clone();
-    cm.up[(0, 1)] = Color::Wildcard;
-    cm.up[(1, 0)] = Color::Wildcard;
-    cm.up[(1, 1)] = Color::Wildcard;
-    cm.up[(1, 2)] = Color::Wildcard;
-    cm.up[(2, 1)] = Color::Wildcard;
-    cm.front[(0, 1)] = Color::Wildcard;
-    cm.front[(1, 1)] = Color::Wildcard;
-    cm.front[(2, 1)] = Color::Wildcard;
-    cm.back[(0, 1)] = Color::Wildcard;
-    cm.back[(1, 1)] = Color::Wildcard;
-    cm.back[(2, 1)] = Color::Wildcard;
-    cm.down[(0, 1)] = Color::Wildcard;
-    cm.down[(1, 1)] = Color::Wildcard;
-    cm.down[(2, 1)] = Color::Wildcard;
-    cm.right[(0, 1)] = Color::Wildcard;
-    cm.left[(0, 1)] = Color::Wildcard;
+    cm.up[(0, 1)] = Color::Other;
+    cm.up[(1, 0)] = Color::Other;
+    cm.up[(1, 1)] = Color::Other;
+    cm.up[(1, 2)] = Color::Other;
+    cm.up[(2, 1)] = Color::Other;
+    cm.front[(0, 1)] = Color::Other;
+    cm.front[(1, 1)] = Color::Other;
+    cm.front[(2, 1)] = Color::Other;
+    cm.back[(0, 1)] = Color::Other;
+    cm.back[(1, 1)] = Color::Other;
+    cm.back[(2, 1)] = Color::Other;
+    cm.right[(0, 1)] = Color::Other;
+    cm.right[(2, 1)] = Color::Other;
+    cm.left[(0, 1)] = Color::Other;
+    cm.left[(2, 1)] = Color::Other;
+    cm.down[(0, 1)] = Color::Other;
+    cm.down[(1, 1)] = Color::Other;
+    cm.down[(2, 1)] = Color::Other;
 
     let subgoal = cube![
-        Y Y Y ;
-        Y Y Y ;
-        Y Y Y ;
-        R R R G G G O O O B B B ;
-        R R R G G G O O O B B B ;
-        R R R G G G O O O B B B ;
-        W W W ;
-        W W W ;
-        W W W ;
+        Y . Y ;
+        . . . ;
+        Y . Y ;
+        R . R G . G O . O B . B ;
+        R . R G G G O . O B B B ;
+        R . R G . G O . O B . B ;
+        W . W ;
+        W . W ;
+        W . W ;
     ];
     let allowed_ops = vec![
         Front(true),
@@ -196,7 +198,36 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
             cube = alg.apply(&cube);
         }
         None => {
-            return None;
+            info!("CMLL'");
+            let allowed_ops = vec![Up(true), Up(false), Right(true), Right(false)];
+            match search_one(&cm, &subgoal, allowed_ops, 12, verbose) {
+                Some(alg) => {
+                    algorithm.extend(&alg);
+                    cube = alg.apply(&cube);
+                }
+                None => {
+                    info!("CMLL''");
+                    let allowed_ops = vec![
+                        Front(true),
+                        Front(false),
+                        Up(true),
+                        Up(false),
+                        Down(true),
+                        Down(false),
+                        RightDouble(true),
+                        RightDouble(false),
+                    ];
+                    match search_one(&cm, &subgoal, allowed_ops, 8, verbose) {
+                        Some(alg) => {
+                            algorithm.extend(&alg);
+                            cube = alg.apply(&cube);
+                        }
+                        None => {
+                            return None;
+                        }
+                    }
+                }
+            }
         }
     }
 
