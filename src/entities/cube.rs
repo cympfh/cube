@@ -360,8 +360,8 @@ impl Cube {
 
 #[cfg(test)]
 mod test_cube {
+    use crate::cube;
     use crate::entities::*;
-    use crate::{cube, Cube, Operation, Ops};
     use Operation::*;
 
     #[test]

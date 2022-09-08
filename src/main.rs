@@ -5,7 +5,7 @@ mod util;
 
 use crate::entities::*;
 use log::{error, info, warn};
-use read::read;
+use read::{cat, read};
 use serde_json::json;
 use std::env;
 use structopt::StructOpt;
@@ -176,7 +176,7 @@ fn main() {
         allowed_ops.push(Z(false));
     }
 
-    let (cube, goal) = read();
+    let (cube, goal) = read(cat().as_str());
     info!("Init\n{}", &cube);
     info!("Goal\n{}", &goal);
     if let Err(col) = validation(&cube, &goal) {
@@ -234,12 +234,4 @@ fn main() {
         info!("No Solution");
         println!("{}", json!({ "ok": false, "solutions": [], }));
     }
-}
-
-#[macro_export]
-macro_rules! trace {
-    ($x:expr) => {
-        info!(">>> {} = {:?}", stringify!($x), $x)
-    };
-    ($($xs:expr),* $(,)?) => { trace!(($($xs),*)) }
 }
