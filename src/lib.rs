@@ -52,7 +52,7 @@ mod test_operation {
             }
         ";
         let allow_ops = "D U";
-        let solutions = solve(&input, &allow_ops, false);
+        let solutions = solve(&input, &allow_ops, 3, 1, false);
         assert_ne!(solutions, String::from(""));
         assert!(!solutions.as_str().starts_with("(failed"));
     }
@@ -64,7 +64,7 @@ mod test_operation {
               U' F B
             }
         ";
-        let solutions = solve(&input, "", true);
+        let solutions = solve(&input, "", 0, 0, true);
         assert_ne!(solutions, String::from(""));
         assert!(!solutions.as_str().starts_with("(failed"));
     }
