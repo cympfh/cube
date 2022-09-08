@@ -1,5 +1,5 @@
 build:
-	npm run build
+	npx vite build --base=/cube/
 
 install:
 	npm install
