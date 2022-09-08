@@ -6,7 +6,13 @@ pub mod solver;
 pub mod util;
 
 #[wasm_bindgen]
-pub fn solve(input: &str, allow_ops: &str, solve_by_roux: bool) -> String {
+pub fn solve(
+    input: &str,
+    allow_ops: &str,
+    max_depth: usize,
+    num: usize,
+    solve_by_roux: bool,
+) -> String {
     let (init, goal) = read::read(input);
     if solve_by_roux {
         if let Some(alg) = solver::roux(&init, false) {
@@ -17,12 +23,16 @@ pub fn solve(input: &str, allow_ops: &str, solve_by_roux: bool) -> String {
     } else {
         match read::parse_ops(allow_ops) {
             Ok((_, allow_ops)) => {
-                let solutions = solver::search(&init, &goal, allow_ops.data, 9, 8, false);
-                solutions
-                    .into_iter()
-                    .map(|ops| format!("{}", ops))
-                    .collect::<Vec<String>>()
-                    .join(";")
+                let solutions = solver::search(&init, &goal, allow_ops.data, max_depth, num, false);
+                if solutions.is_empty() {
+                    String::from("(failed:no_solutions)")
+                } else {
+                    solutions
+                        .into_iter()
+                        .map(|ops| format!("{}", ops))
+                        .collect::<Vec<String>>()
+                        .join(";")
+                }
             }
             Err(_) => String::from("(failed:invalid_operations)"),
         }
