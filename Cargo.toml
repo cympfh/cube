@@ -3,9 +3,13 @@ name = "cube"
 version = "0.4.1"
 edition = "2021"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 structopt = { version = "0.3", default-features = false }
 log = "0.4"
 env_logger = "*"
 serde_json = "*"
 nom = "7"
+wasm-bindgen = "0.2"

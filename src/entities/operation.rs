@@ -123,7 +123,7 @@ impl std::fmt::Display for Operation {
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Ops {
-    data: Vec<Operation>,
+    pub data: Vec<Operation>,
 }
 
 impl Ops {

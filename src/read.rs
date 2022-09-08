@@ -18,7 +18,7 @@ enum Entry {
     Scramble(Ops),
 }
 
-fn cat() -> String {
+pub fn cat() -> String {
     let stdin = std::io::stdin();
     let mut buf = String::new();
     loop {
@@ -32,9 +32,7 @@ fn cat() -> String {
     buf
 }
 
-pub fn read() -> (Cube, Cube) {
-    let buf = cat();
-    let mut buf = buf.as_str();
+pub fn read(mut buf: &str) -> (Cube, Cube) {
     let canonical = cube![
         Y Y Y;
         Y Y Y;
@@ -157,7 +155,7 @@ fn parse_cube(input: &str) -> IResult<&str, Cube> {
     })(input)
 }
 
-fn parse_ops(input: &str) -> IResult<&str, Ops> {
+pub fn parse_ops(input: &str) -> IResult<&str, Ops> {
     fn parse_opss(input: &str) -> IResult<&str, Vec<Operation>> {
         use Operation::*;
         preceded(

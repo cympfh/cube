@@ -1,4 +1,12 @@
 #[macro_export]
+macro_rules! trace {
+    ($x:expr) => {
+        info!(">>> {} = {:?}", stringify!($x), $x)
+    };
+    ($($xs:expr),* $(,)?) => { trace!(($($xs),*)) }
+}
+
+#[macro_export]
 macro_rules! rotate {
     ($shift:expr, [ $( $loc:expr ),* $(,)? ]) => {
         let mut colors = vec![ $( $loc ),* ];
