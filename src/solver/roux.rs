@@ -282,5 +282,5 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
         }
     }
 
-    Some(algorithm)
+    Some(algorithm.shorten())
 }

@@ -186,7 +186,6 @@ fn main() {
 
     if opt.roux {
         if let Some(alg) = solver::roux(&cube, opt.verbose) {
-            let alg = alg.shorten();
             println!(
                 "{}",
                 json!({
