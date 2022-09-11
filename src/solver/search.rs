@@ -72,6 +72,7 @@ fn solve_wo_xyz(
     verbose: bool,
 ) -> Vec<Ops> {
     const MAX_GOALMAP_SIZE: usize = 1000;
+
     let mut q = BinaryHeap::new();
     q.push((Reverse((0, true)), init_state.clone(), Ops::default(), true));
     for (c, ops) in goal_map.iter() {
@@ -117,6 +118,9 @@ fn solve_wo_xyz(
             }
         } else {
             if !exact && goal_map.len() > MAX_GOALMAP_SIZE {
+                continue;
+            }
+            if goal_map.contains_key(&c) {
                 continue;
             }
             goal_map.insert(c.clone(), ops.clone());
