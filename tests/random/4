@@ -1,4 +1,4 @@
-# cube --roux < tests/roux/4
+# cube --roux
 
 Scramble {
   B U2 R' D2 B2 U2 R F2 D2 R' B2 U2 B2 F' U' L F2 L D B2

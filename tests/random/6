@@ -1,0 +1,7 @@
+# Try:
+# cube --cfop
+
+Scramble {
+  B2 F' R U L2 D' L' R2 U B' F' D2 U B' F2
+  D2 U2 L R B L' R B F L2 R' D F' L' R'
+}

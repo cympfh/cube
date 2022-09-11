@@ -64,6 +64,12 @@ struct Opt {
 
     #[structopt(
         long,
+        help = "Complete solve by CFOP method, other options are all ignored"
+    )]
+    cfop: bool,
+
+    #[structopt(
+        long,
         help = "Complete solve by Roux method, other options are all ignored"
     )]
     roux: bool,
@@ -181,6 +187,25 @@ fn main() {
     info!("Goal\n{}", &goal);
     if let Err(col) = validation(&cube, &goal) {
         error!("Validation Failed. Check number of color:{}.", col);
+        return;
+    }
+
+    if opt.cfop {
+        if let Some(alg) = solver::cfop(&cube, opt.verbose) {
+            println!(
+                "{}",
+                json!({
+                    "ok": true,
+                    "solution": {
+                        "algorithm": format!("{}", alg),
+                        "length": alg.len(),
+                    }
+                })
+            );
+        } else {
+            info!("No Solution");
+            println!("{}", json!({ "ok": false, "solution": {} }));
+        }
         return;
     }
 
