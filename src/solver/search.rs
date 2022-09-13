@@ -64,18 +64,19 @@ fn xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
 /// Bi-direction search with xyz_map
 fn solve_wo_xyz(
     init_state: &Cube,
-    goal_map: &mut BTreeMap<Cube, Ops>,
+    xyz_map: &BTreeMap<Cube, Ops>,
     allowed_ops: Vec<Operation>,
     max_depth: usize,
     num: usize,
     exact: bool,
     verbose: bool,
 ) -> Vec<Ops> {
+    let mut goal_map = BTreeMap::new();
     const MAX_GOALMAP_SIZE: usize = 1000;
 
     let mut q = BinaryHeap::new();
     q.push((Reverse((0, true)), init_state.clone(), Ops::default(), true));
-    for (c, ops) in goal_map.iter() {
+    for (c, ops) in xyz_map.iter() {
         q.push((Reverse((ops.len(), false)), c.clone(), ops.clone(), false));
     }
 
@@ -107,7 +108,7 @@ fn solve_wo_xyz(
             info!("Searching depth: {}", searching_depth);
         }
         if from_start {
-            if let Some(solution) = found(&c, &mut ops, goal_map) {
+            if let Some(solution) = found(&c, &mut ops, &mut goal_map) {
                 info!("Solution: {}", solution);
                 if verbose {
                     let c = solution.apply(&init_state);
@@ -120,10 +121,9 @@ fn solve_wo_xyz(
             if !exact && goal_map.len() > MAX_GOALMAP_SIZE {
                 continue;
             }
-            if goal_map.contains_key(&c) {
-                continue;
+            if !goal_map.contains_key(&c) {
+                goal_map.insert(c.clone(), ops.clone());
             }
-            goal_map.insert(c.clone(), ops.clone());
         }
         if ops.len() >= max_depth {
             continue;

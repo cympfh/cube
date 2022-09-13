@@ -1,6 +1,7 @@
 use crate::cube;
 use crate::entities::*;
 use crate::solver::search;
+use crate::util;
 use log::info;
 
 fn search_one(
@@ -21,17 +22,31 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     use Operation::*;
 
     info!("Cross");
+    let mut subcube = cube.clone();
+    for ((face0, i0, j0), (face1, i1, j1), (face2, i2, j2)) in util::corners() {
+        subcube[face0][(i0, j0)] = Color::Other;
+        subcube[face1][(i1, j1)] = Color::Other;
+        subcube[face2][(i2, j2)] = Color::Other;
+    }
+    for ((face0, i0, j0), (face1, i1, j1)) in util::edges() {
+        if subcube[face0][(i0, j0)] == Color::White || subcube[face1][(i1, j1)] == Color::White {
+            continue;
+        }
+        subcube[face0][(i0, j0)] = Color::Other;
+        subcube[face1][(i1, j1)] = Color::Other;
+    }
     let subgoal = cube![
-        * * * ;
-        * Y * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        * R * * G * * O * * B * ;
-        * R * * G * * O * * B * ;
-        * W * ;
+        . . . ;
+        . Y . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        . R . . G . . O . . B . ;
+        . R . . G . . O . . B . ;
+        . W . ;
         W W W ;
-        * W * ;
+        . W . ;
     ];
+
     let allowed_ops = vec![
         Front(true),
         Front(false),
@@ -46,7 +61,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 5, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
