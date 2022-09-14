@@ -71,9 +71,9 @@ fn solve(
     exact: bool,
     verbose: bool,
 ) -> Vec<Ops> {
-    let mut cubes_from_start = BTreeSet::new();
+    let mut cubes_from_start = BTreeMap::new();
     let mut cubes_from_goal = BTreeMap::new();
-    const MAX_GOALMAP_SIZE: usize = 1000;
+    const MAX_MAP_SIZE: usize = 20_000;
 
     let mut q = BinaryHeap::new();
     q.push((Reverse((0, true)), init_state.clone(), Ops::default(), true));
@@ -82,16 +82,46 @@ fn solve(
     }
 
     let mut solutions = vec![];
-    let found =
-        |cube: &Cube, ops: &mut Ops, cubes_from_goal: &mut BTreeMap<Cube, Ops>| -> Option<Ops> {
+    let add_solution = |solutions: &mut Vec<Ops>, solution: Ops| {
+        info!("Solution: {}", solution);
+        if verbose {
+            let c = solution.apply(&init_state);
+            info!("Validation:\n{}", c);
+        }
+        solutions.push(solution);
+    };
+
+    let found = |cube: &Cube, ops: &Ops, cubes_from_goal: &BTreeMap<Cube, Ops>| -> Option<Ops> {
+        if exact {
+            if let Some(ops_from_goal) = cubes_from_goal.get(&cube) {
+                let mut ops = ops.clone();
+                ops.extend(&ops_from_goal.rev());
+                return Some(ops.clone());
+            }
+        } else {
+            for (d, ops_from_goal) in cubes_from_goal.iter() {
+                if cube.matched(d) {
+                    let mut ops = ops.clone();
+                    ops.extend(&ops_from_goal.rev());
+                    return Some(ops.clone());
+                }
+            }
+        }
+        None
+    };
+
+    let found_reverse =
+        |cube: &Cube, ops_from_goal: &Ops, cubes_from_start: &BTreeMap<Cube, Ops>| -> Option<Ops> {
             if exact {
-                if let Some(ops_from_goal) = cubes_from_goal.get(&cube) {
+                if let Some(ops) = cubes_from_start.get(&cube) {
+                    let mut ops = ops.clone();
                     ops.extend(&ops_from_goal.rev());
                     return Some(ops.clone());
                 }
             } else {
-                for (d, ops_from_goal) in cubes_from_goal.iter() {
+                for (d, ops) in cubes_from_start.iter() {
                     if cube.matched(d) {
+                        let mut ops = ops.clone();
                         ops.extend(&ops_from_goal.rev());
                         return Some(ops.clone());
                     }
@@ -101,7 +131,7 @@ fn solve(
         };
 
     let mut searching_depth: usize = 0;
-    while let Some((_, c, mut ops, from_start)) = q.pop() {
+    while let Some((_, c, ops, from_start)) = q.pop() {
         if solutions.len() >= num {
             break;
         }
@@ -110,27 +140,29 @@ fn solve(
             info!("Searching depth: {}", searching_depth);
         }
         if from_start {
-            if cubes_from_start.contains(&c) {
+            if !exact && cubes_from_goal.len() > MAX_MAP_SIZE {
                 continue;
             }
-            cubes_from_start.insert(c.clone());
-            if let Some(solution) = found(&c, &mut ops, &mut cubes_from_goal) {
-                info!("Solution: {}", solution);
-                if verbose {
-                    let c = solution.apply(&init_state);
-                    info!("Validation:\n{}", c);
-                }
-                solutions.push(solution);
+            if cubes_from_start.contains_key(&c) {
+                continue;
+            }
+            cubes_from_start.insert(c.clone(), ops.clone());
+            if let Some(solution) = found(&c, &ops, &cubes_from_goal) {
+                add_solution(&mut solutions, solution);
                 continue;
             }
         } else {
-            if !exact && cubes_from_goal.len() > MAX_GOALMAP_SIZE {
+            if !exact && cubes_from_goal.len() > MAX_MAP_SIZE {
                 continue;
             }
             if cubes_from_goal.contains_key(&c) {
                 continue;
             }
             cubes_from_goal.insert(c.clone(), ops.clone());
+            if let Some(solution) = found_reverse(&c, &ops, &cubes_from_start) {
+                add_solution(&mut solutions, solution);
+                continue;
+            }
         }
         if ops.len() >= max_depth {
             continue;
