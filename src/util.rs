@@ -85,3 +85,42 @@ macro_rules! cube {
         Color::Wildcard
     };
 }
+
+use crate::entities::FaceIndex;
+pub type Corner = (
+    (FaceIndex, usize, usize),
+    (FaceIndex, usize, usize),
+    (FaceIndex, usize, usize),
+);
+pub fn corners() -> Vec<Corner> {
+    use FaceIndex::*;
+    vec![
+        ((Up, 2, 0), (Front, 0, 0), (Left, 0, 2)),
+        ((Up, 2, 2), (Front, 0, 2), (Right, 0, 0)),
+        ((Up, 0, 0), (Left, 0, 0), (Back, 0, 2)),
+        ((Up, 0, 2), (Right, 0, 2), (Back, 0, 0)),
+        ((Front, 2, 0), (Down, 0, 0), (Left, 2, 2)),
+        ((Front, 2, 2), (Down, 0, 2), (Right, 2, 0)),
+        ((Back, 2, 0), (Down, 2, 2), (Right, 2, 2)),
+        ((Back, 2, 2), (Down, 2, 0), (Left, 2, 0)),
+    ]
+}
+
+pub type Edge = ((FaceIndex, usize, usize), (FaceIndex, usize, usize));
+pub fn edges() -> Vec<Edge> {
+    use FaceIndex::*;
+    vec![
+        ((Up, 2, 1), (Front, 0, 1)),
+        ((Up, 1, 2), (Right, 0, 1)),
+        ((Up, 0, 1), (Back, 0, 1)),
+        ((Up, 1, 0), (Left, 0, 1)),
+        ((Front, 1, 0), (Left, 1, 2)),
+        ((Front, 1, 2), (Right, 1, 0)),
+        ((Back, 1, 0), (Right, 1, 2)),
+        ((Back, 1, 2), (Left, 1, 0)),
+        ((Down, 0, 1), (Front, 2, 1)),
+        ((Down, 1, 0), (Left, 2, 1)),
+        ((Down, 1, 2), (Right, 2, 1)),
+        ((Down, 2, 1), (Back, 2, 1)),
+    ]
+}

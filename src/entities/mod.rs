@@ -1,8 +1,10 @@
 mod color;
 mod cube;
 mod face;
+mod faceindex;
 mod operation;
 pub use self::cube::Cube;
 pub use color::Color;
 pub use face::Face;
+pub use faceindex::FaceIndex;
 pub use operation::{Operation, Ops};

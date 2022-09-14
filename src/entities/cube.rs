@@ -1,4 +1,4 @@
-use crate::entities::{Color, Face, Operation};
+use crate::entities::{Color, Face, FaceIndex, Operation};
 use crate::rotate;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -355,6 +355,35 @@ impl Cube {
             }
         }
         count
+    }
+}
+
+impl std::ops::Index<FaceIndex> for Cube {
+    type Output = Face;
+    fn index(&self, fi: FaceIndex) -> &Self::Output {
+        use FaceIndex::*;
+        match fi {
+            Front => &self.front,
+            Back => &self.back,
+            Up => &self.up,
+            Down => &self.down,
+            Left => &self.left,
+            Right => &self.right,
+        }
+    }
+}
+
+impl std::ops::IndexMut<FaceIndex> for Cube {
+    fn index_mut(&mut self, fi: FaceIndex) -> &mut Self::Output {
+        use FaceIndex::*;
+        match fi {
+            Front => &mut self.front,
+            Back => &mut self.back,
+            Up => &mut self.up,
+            Down => &mut self.down,
+            Left => &mut self.left,
+            Right => &mut self.right,
+        }
     }
 }
 
