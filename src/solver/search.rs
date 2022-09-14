@@ -13,14 +13,14 @@ pub fn search(
     num: usize,
     verbose: bool,
 ) -> Vec<Ops> {
-    let mut goal_map = xyz(goal);
+    let xyz_map = xyz(goal);
     let exact = !init_state.has_wildcard() && !goal.has_wildcard();
     if verbose {
         trace!(exact);
     }
-    solve_wo_xyz(
+    solve(
         init_state,
-        &mut goal_map,
+        &xyz_map,
         allowed_ops,
         max_depth,
         num,
@@ -62,7 +62,7 @@ fn xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
 }
 
 /// Bi-direction search with xyz_map
-fn solve_wo_xyz(
+fn solve(
     init_state: &Cube,
     xyz_map: &BTreeMap<Cube, Ops>,
     allowed_ops: Vec<Operation>,
@@ -71,7 +71,8 @@ fn solve_wo_xyz(
     exact: bool,
     verbose: bool,
 ) -> Vec<Ops> {
-    let mut goal_map = BTreeMap::new();
+    let mut cubes_from_start = BTreeSet::new();
+    let mut cubes_from_goal = BTreeMap::new();
     const MAX_GOALMAP_SIZE: usize = 1000;
 
     let mut q = BinaryHeap::new();
@@ -81,22 +82,23 @@ fn solve_wo_xyz(
     }
 
     let mut solutions = vec![];
-    let found = |cube: &Cube, ops: &mut Ops, goal_map: &mut BTreeMap<Cube, Ops>| -> Option<Ops> {
-        if exact {
-            if let Some(ops_from_goal) = goal_map.get(&cube) {
-                ops.extend(&ops_from_goal.rev());
-                return Some(ops.clone());
-            }
-        } else {
-            for (d, ops_from_goal) in goal_map.iter() {
-                if cube.matched(d) {
+    let found =
+        |cube: &Cube, ops: &mut Ops, cubes_from_goal: &mut BTreeMap<Cube, Ops>| -> Option<Ops> {
+            if exact {
+                if let Some(ops_from_goal) = cubes_from_goal.get(&cube) {
                     ops.extend(&ops_from_goal.rev());
                     return Some(ops.clone());
                 }
+            } else {
+                for (d, ops_from_goal) in cubes_from_goal.iter() {
+                    if cube.matched(d) {
+                        ops.extend(&ops_from_goal.rev());
+                        return Some(ops.clone());
+                    }
+                }
             }
-        }
-        None
-    };
+            None
+        };
 
     let mut searching_depth: usize = 0;
     while let Some((_, c, mut ops, from_start)) = q.pop() {
@@ -108,7 +110,11 @@ fn solve_wo_xyz(
             info!("Searching depth: {}", searching_depth);
         }
         if from_start {
-            if let Some(solution) = found(&c, &mut ops, &mut goal_map) {
+            if cubes_from_start.contains(&c) {
+                continue;
+            }
+            cubes_from_start.insert(c.clone());
+            if let Some(solution) = found(&c, &mut ops, &mut cubes_from_goal) {
                 info!("Solution: {}", solution);
                 if verbose {
                     let c = solution.apply(&init_state);
@@ -118,12 +124,13 @@ fn solve_wo_xyz(
                 continue;
             }
         } else {
-            if !exact && goal_map.len() > MAX_GOALMAP_SIZE {
+            if !exact && cubes_from_goal.len() > MAX_GOALMAP_SIZE {
                 continue;
             }
-            if !goal_map.contains_key(&c) {
-                goal_map.insert(c.clone(), ops.clone());
+            if cubes_from_goal.contains_key(&c) {
+                continue;
             }
+            cubes_from_goal.insert(c.clone(), ops.clone());
         }
         if ops.len() >= max_depth {
             continue;

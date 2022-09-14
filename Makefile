@@ -15,18 +15,21 @@ pages: wasm
 	rsync -r pages/dist/ docs/
 
 benchmark:
-	cargo build --release
-	hyperfine -r 10 'cargo run --release -- --roux < tests/random/1'
-	hyperfine -r 10 'cargo run --release -- --roux < tests/random/2'
-	hyperfine -r 2 'cargo run --release -- --cfop < tests/random/1'
-	hyperfine -r 2 'cargo run --release -- --cfop < tests/random/2'
+	@cargo build --release
+	@hyperfine -r 20 'cargo run --release -- --roux < tests/random/1'
+	@hyperfine -r 20 'cargo run --release -- --roux < tests/random/2'
+	@hyperfine -r 5 'cargo run --release -- --cfop < tests/random/1'
+	@hyperfine -r 5 'cargo run --release -- --cfop < tests/random/2'
 
 test:
 	cargo test
 	[ true = $$(cargo run -q --release -- -q -DU < tests/simple/ddu | jq .ok) ]
-	[ true = $$(cargo run -q --release -- -q -FURLBD --max-depth 5 < tests/simple/small | jq .ok) ]
+	[ true = $$(cargo run -q --release -- -q -FURLBD < tests/simple/small | jq .ok) ]
+	[ true = $$(cargo run -q --release -- -q -RBFD < tests/simple/tiny | jq .ok) ]
+	[ true = $$(cargo run -q --release -- -q --roux < tests/simple/tiny | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --roux < tests/random/1 | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --roux < tests/random/2 | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --roux < tests/random/3 | jq .ok) ]
+	[ true = $$(cargo run -q --release -- -q --cfop < tests/simple/tiny | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --cfop < tests/random/1 | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --cfop < tests/random/2 | jq .ok) ]
