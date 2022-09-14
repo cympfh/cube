@@ -22,6 +22,7 @@ benchmark:
 	hyperfine -r 2 'cargo run --release -- --cfop < tests/random/2'
 
 test:
+	cargo test
 	[ true = $$(cargo run -q --release -- -q -DU < tests/simple/ddu | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q -FURLBD --max-depth 5 < tests/simple/small | jq .ok) ]
 	[ true = $$(cargo run -q --release -- -q --roux < tests/random/1 | jq .ok) ]
