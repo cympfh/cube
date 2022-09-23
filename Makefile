@@ -14,10 +14,16 @@ pages: wasm
 	mkdir -p docs
 	rsync -r pages/dist/ docs/
 
-benchmark:
+benchmark: benchmark-roux benchmark-cfop
+
+benchmark-init:
 	@cargo build --release
+
+benchmark-roux: benchmark-init
 	@hyperfine -r 20 'cargo run --release -- -q --roux < tests/random/1'
 	@hyperfine -r 20 'cargo run --release -- -q --roux < tests/random/2'
+
+benchmark-cfop: benchmark-init
 	@hyperfine -r 5 'cargo run --release -- -q --cfop < tests/random/1'
 	@hyperfine -r 5 'cargo run --release -- -q --cfop < tests/random/2'
 

@@ -78,7 +78,12 @@ fn solve(
     let mut q = BinaryHeap::new();
     q.push((Reverse((0, true)), init_state.clone(), Ops::default(), true));
     for (c, ops) in xyz_map.iter() {
-        q.push((Reverse((ops.len(), false)), c.clone(), ops.clone(), false));
+        q.push((
+            Reverse((ops.weight(), false)),
+            c.clone(),
+            ops.clone(),
+            false,
+        ));
     }
 
     let mut solutions = vec![];
@@ -188,11 +193,26 @@ fn solve(
             if last_repeat == Some(op) {
                 continue;
             }
+            // Jb is too heavy
+            if let Jb(_) = op {
+                if !from_start {
+                    continue;
+                }
+                let mut skip = false;
+                for &op in ops.data.iter() {
+                    if let Jb(_) = op {
+                        skip = true;
+                    }
+                }
+                if skip {
+                    continue;
+                }
+            }
             let mut c = c.clone();
             c.apply(op);
             let mut ops = ops.clone();
             ops.push(op);
-            q.push((Reverse((ops.len(), from_start)), c, ops, from_start));
+            q.push((Reverse((ops.weight(), from_start)), c, ops, from_start));
         }
     }
     solutions

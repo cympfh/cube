@@ -22,6 +22,9 @@ pub enum Operation {
     X(bool),
     Y(bool),
     Z(bool),
+    Sexy(bool),
+    SledgeHammer(bool),
+    Jb(bool),
 }
 
 impl Operation {
@@ -46,6 +49,9 @@ impl Operation {
             X(clockwise) => X(!clockwise),
             Y(clockwise) => Y(!clockwise),
             Z(clockwise) => Z(!clockwise),
+            Sexy(clockwise) => Sexy(!clockwise),
+            SledgeHammer(clockwise) => SledgeHammer(!clockwise),
+            Jb(clockwise) => Jb(!clockwise),
         }
     }
     pub fn is_reversed(&self) -> bool {
@@ -69,6 +75,9 @@ impl Operation {
             X(clockwise) => !clockwise,
             Y(clockwise) => !clockwise,
             Z(clockwise) => !clockwise,
+            Sexy(clockwise) => !clockwise,
+            SledgeHammer(clockwise) => !clockwise,
+            Jb(clockwise) => !clockwise,
         }
     }
 }
@@ -116,6 +125,12 @@ impl std::fmt::Display for Operation {
                 Y(false) => "y'",
                 Z(true) => "z",
                 Z(false) => "z'",
+                Sexy(true) => "(Sx)",
+                Sexy(false) => "(Sx)'",
+                SledgeHammer(true) => "(SH)",
+                SledgeHammer(false) => "(SH)'",
+                Jb(true) => "(Jb)",
+                Jb(false) => "(Jb)'",
             }
         )
     }
@@ -139,6 +154,19 @@ impl Ops {
     }
     pub fn len(&self) -> usize {
         self.data.len()
+    }
+    /// length of expanded
+    pub fn weight(&self) -> usize {
+        use Operation::*;
+        self.data
+            .iter()
+            .map(|op| match op {
+                Sexy(_) => 4,
+                SledgeHammer(_) => 4,
+                Jb(_) => 14,
+                _ => 1,
+            })
+            .sum::<usize>()
     }
     pub fn last(&self) -> Option<Operation> {
         self.data.last().cloned()
@@ -170,6 +198,85 @@ impl Ops {
             c.apply(op);
         }
         c
+    }
+    pub fn expand(&self) -> Self {
+        use Operation::*;
+        let mut ops = Ops::default();
+        for &op in self.data.iter() {
+            match op {
+                Sexy(true) => {
+                    ops.push(Right(true));
+                    ops.push(Up(true));
+                    ops.push(Right(false));
+                    ops.push(Up(false));
+                }
+                Sexy(false) => {
+                    ops.push(Up(true));
+                    ops.push(Right(true));
+                    ops.push(Up(false));
+                    ops.push(Right(false));
+                }
+                SledgeHammer(true) => {
+                    ops.push(Right(false));
+                    ops.push(Front(true));
+                    ops.push(Right(true));
+                    ops.push(Front(false));
+                }
+                SledgeHammer(false) => {
+                    ops.push(Front(true));
+                    ops.push(Right(false));
+                    ops.push(Front(false));
+                    ops.push(Right(true));
+                }
+                Jb(true) => {
+                    // R U R' F' R U R' U' R' F R2 U' R'
+                    for op in [
+                        Right(true),
+                        Up(true),
+                        Right(false),
+                        Front(false),
+                        Right(true),
+                        Up(true),
+                        Right(false),
+                        Up(false),
+                        Right(false),
+                        Front(true),
+                        Right(true),
+                        Right(true),
+                        Up(false),
+                        Right(false),
+                    ] {
+                        ops.push(op);
+                    }
+                }
+                Jb(false) => {
+                    // (R U R' F' R U R' U' R' F R2 U' R')'
+                    for op in [
+                        Right(true),
+                        Up(true),
+                        Right(false),
+                        Front(false),
+                        Right(true),
+                        Up(true),
+                        Right(false),
+                        Up(false),
+                        Right(false),
+                        Front(true),
+                        Right(true),
+                        Right(true),
+                        Up(false),
+                        Right(false),
+                    ]
+                    .iter()
+                    .rev()
+                    {
+                        ops.push(op.rev());
+                    }
+                }
+                _ => ops.push(op),
+            }
+        }
+        ops
     }
     pub fn shorten(&self) -> Self {
         let mut ops = Ops::default();

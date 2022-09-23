@@ -1,5 +1,7 @@
 use crate::entities::{Color, Face, FaceIndex, Operation};
 use crate::rotate;
+use crate::util;
+use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cube {
@@ -73,6 +75,55 @@ impl Cube {
             || self.left.has_wildcard()
             || self.front.has_wildcard()
             || self.back.has_wildcard()
+    }
+    /// Replace with Color::Other
+    pub fn mask(&mut self, mask_cube: &Cube) {
+        let mut cx = BTreeSet::new();
+        for c in util::centers().iter() {
+            cx.insert(mask_cube[c.0].at(c.1, c.2));
+        }
+        for c in util::centers().iter() {
+            if !cx.contains(&self[c.0].at(c.1, c.2)) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+            }
+        }
+        let mut cx = BTreeSet::new();
+        for (c, d) in util::edges().iter() {
+            let mut v = vec![mask_cube[c.0].at(c.1, c.2), mask_cube[d.0].at(d.1, d.2)];
+            v.sort();
+            cx.insert(v);
+        }
+        for (c, d) in util::edges().iter() {
+            let mut v = vec![self[c.0].at(c.1, c.2), self[d.0].at(d.1, d.2)];
+            v.sort();
+            if !cx.contains(&v) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+                self[d.0][(d.1, d.2)] = Color::Other;
+            }
+        }
+        let mut cx = BTreeSet::new();
+        for (c, d, e) in util::corners().iter() {
+            let mut v = vec![
+                mask_cube[c.0].at(c.1, c.2),
+                mask_cube[d.0].at(d.1, d.2),
+                mask_cube[e.0].at(e.1, e.2),
+            ];
+            v.sort();
+            cx.insert(v);
+        }
+        for (c, d, e) in util::corners().iter() {
+            let mut v = vec![
+                self[c.0].at(c.1, c.2),
+                self[d.0].at(d.1, d.2),
+                self[e.0].at(e.1, e.2),
+            ];
+            v.sort();
+            if !cx.contains(&v) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+                self[d.0][(d.1, d.2)] = Color::Other;
+                self[e.0][(e.1, e.2)] = Color::Other;
+            }
+        }
     }
 }
 
@@ -318,6 +369,75 @@ impl Cube {
                 self.apply(Front(clockwise));
                 self.apply(Standing(clockwise));
                 self.apply(Back(!clockwise));
+            }
+            Sexy(true) => {
+                self.apply(Right(true));
+                self.apply(Up(true));
+                self.apply(Right(false));
+                self.apply(Up(false));
+            }
+            Sexy(false) => {
+                self.apply(Up(true));
+                self.apply(Right(true));
+                self.apply(Up(false));
+                self.apply(Right(false));
+            }
+            SledgeHammer(true) => {
+                self.apply(Right(false));
+                self.apply(Front(true));
+                self.apply(Right(true));
+                self.apply(Front(false));
+            }
+            SledgeHammer(false) => {
+                self.apply(Front(true));
+                self.apply(Right(false));
+                self.apply(Front(false));
+                self.apply(Right(true));
+            }
+            Jb(true) => {
+                // R U R' F' R U R' U' R' F R2 U' R'
+                for op in [
+                    Right(true),
+                    Up(true),
+                    Right(false),
+                    Front(false),
+                    Right(true),
+                    Up(true),
+                    Right(false),
+                    Up(false),
+                    Right(false),
+                    Front(true),
+                    Right(true),
+                    Right(true),
+                    Up(false),
+                    Right(false),
+                ] {
+                    self.apply(op);
+                }
+            }
+            Jb(false) => {
+                // (R U R' F' R U R' U' R' F R2 U' R')'
+                for op in [
+                    Right(true),
+                    Up(true),
+                    Right(false),
+                    Front(false),
+                    Right(true),
+                    Up(true),
+                    Right(false),
+                    Up(false),
+                    Right(false),
+                    Front(true),
+                    Right(true),
+                    Right(true),
+                    Up(false),
+                    Right(false),
+                ]
+                .iter()
+                .rev()
+                {
+                    self.apply(op.rev());
+                }
             }
         }
     }

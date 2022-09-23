@@ -1,7 +1,6 @@
 use crate::cube;
 use crate::entities::*;
 use crate::solver::search;
-use crate::util;
 use log::info;
 
 fn search_one(
@@ -22,19 +21,6 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     use Operation::*;
 
     info!("Cross");
-    let mut subcube = cube.clone();
-    for ((face0, i0, j0), (face1, i1, j1), (face2, i2, j2)) in util::corners() {
-        subcube[face0][(i0, j0)] = Color::Other;
-        subcube[face1][(i1, j1)] = Color::Other;
-        subcube[face2][(i2, j2)] = Color::Other;
-    }
-    for ((face0, i0, j0), (face1, i1, j1)) in util::edges() {
-        if subcube[face0][(i0, j0)] == Color::White || subcube[face1][(i1, j1)] == Color::White {
-            continue;
-        }
-        subcube[face0][(i0, j0)] = Color::Other;
-        subcube[face1][(i1, j1)] = Color::Other;
-    }
     let subgoal = cube![
         . . . ;
         . Y . ;
@@ -46,7 +32,8 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         W W W ;
         . W . ;
     ];
-
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Front(true),
         Front(false),
@@ -73,16 +60,18 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("F2L/#1");
     let subgoal = cube![
-        * * * ;
-        * Y * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R R * * G * * O * * B B ;
-        R R * * G * * O * * B B ;
-        W W * ;
+        . . . ;
+        . Y . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R R . . G . . O . . B B ;
+        R R . . G . . O . . B B ;
+        W W . ;
         W W W ;
-        * W * ;
+        . W . ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Front(true),
         Front(false),
@@ -95,7 +84,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 6, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -107,19 +96,19 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("F2L/#2");
     let subgoal = cube![
-        * * * ;
-        * Y * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R R * * G * * O O B B B ;
-        R R * * G * * O O B B B ;
-        W W * ;
+        . . . ;
+        . Y . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R R . . G . . O O B B B ;
+        R R . . G . . O O B B B ;
+        W W . ;
         W W W ;
-        W W * ;
+        W W . ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
-        // Front(true),
-        // Front(false),
         Back(true),
         Back(false),
         Up(true),
@@ -129,7 +118,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -139,61 +128,31 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         }
     }
 
-    info!("F2L/#3");
+    info!("F2L/#3+#4");
     let subgoal = cube![
-        * * * ;
-        * Y * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R R * * G G O O O B B B ;
-        R R * * G G O O O B B B ;
-        W W * ;
+        . . . ;
+        . Y . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R R R G G G O O O B B B ;
+        R R R G G G O O O B B B ;
+        W W W ;
         W W W ;
         W W W ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
-        // Front(true),
-        // Front(false),
+        Front(true),
+        Front(false),
         Back(true),
         Back(false),
         Up(true),
         Up(false),
         Right(true),
         Right(false),
-        // Left(true),
-        // Left(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
-        Some(alg) => {
-            algorithm.extend(&alg);
-            cube = alg.apply(&cube);
-        }
-        None => {
-            return None;
-        }
-    }
-
-    info!("F2L/#4");
-    let subgoal = cube![
-        * * * ;
-        * Y * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R R R G G G O O O B B B ;
-        R R R G G G O O O B B B ;
-        W W W ;
-        W W W ;
-        W W W ;
-    ];
-    let allowed_ops = vec![
-        Front(true),
-        Front(false),
-        Up(true),
-        Up(false),
-        Right(true),
-        Right(false),
-    ];
-    match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 6, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -299,62 +258,51 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     ];
     info!("PLL/MU");
     let allowed_ops = vec![Up(true), Up(false), Middle(true), Middle(false)];
-    match search_one(&cube, &subgoal, allowed_ops, 10, verbose) {
+    match search_one(&cube, &subgoal, allowed_ops, 7, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
         }
         None => {
-            info!("PLL/FUR");
+            info!("PLL/RUF+Jb+Sx+SH");
             let allowed_ops = vec![
-                Front(true),
-                Front(false),
                 Up(true),
                 Up(false),
+                Front(true),
+                Front(false),
                 Right(true),
                 Right(false),
+                Down(true),
+                Down(false),
+                Jb(true),
+                Sexy(true),
+                Sexy(false),
+                SledgeHammer(true),
+                SledgeHammer(false),
             ];
-            match search_one(&cube, &subgoal, allowed_ops, 9, verbose) {
+            match search_one(&cube, &subgoal, allowed_ops, 5, verbose) {
                 Some(alg) => {
                     algorithm.extend(&alg);
                     cube = alg.apply(&cube);
                 }
                 None => {
-                    info!("PLL/UDR");
+                    // This can solve all PLL speedy!!
+                    info!("PLL/U+Sx+SH");
                     let allowed_ops = vec![
                         Up(true),
                         Up(false),
-                        Down(true),
-                        Down(false),
-                        Right(true),
-                        Right(false),
+                        Sexy(true),
+                        Sexy(false),
+                        SledgeHammer(true),
+                        SledgeHammer(false),
                     ];
-                    match search_one(&cube, &subgoal, allowed_ops, 9, verbose) {
+                    match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
                         Some(alg) => {
                             algorithm.extend(&alg);
                             cube = alg.apply(&cube);
                         }
                         None => {
-                            info!("PLL/Full");
-                            let allowed_ops = vec![
-                                Front(true),
-                                Front(false),
-                                Up(true),
-                                Up(false),
-                                Right(true),
-                                Right(false),
-                                RightDouble(true),
-                                RightDouble(false),
-                            ];
-                            match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
-                                Some(alg) => {
-                                    algorithm.extend(&alg);
-                                    cube = alg.apply(&cube);
-                                }
-                                None => {
-                                    return None;
-                                }
-                            }
+                            return None;
                         }
                     }
                 }
@@ -363,5 +311,5 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     info!("{}", cube);
-    Some(algorithm.shorten())
+    Some(algorithm.expand().shorten())
 }
