@@ -82,14 +82,20 @@ fn solve(
     }
 
     let mut solutions = vec![];
-    let add_solution = |solutions: &mut Vec<Ops>, solution: Ops| {
-        info!("Solution: {}", solution);
-        if verbose {
-            let c = solution.apply(&init_state);
-            info!("Validation:\n{}", c);
-        }
-        solutions.push(solution);
-    };
+    let mut solutionset = BTreeSet::new();
+    let add_solution =
+        |solutions: &mut Vec<Ops>, solutionset: &mut BTreeSet<Ops>, solution: Ops| {
+            if solutionset.contains(&solution) {
+                return;
+            }
+            info!("Solution: {}", solution);
+            if verbose {
+                let c = solution.apply(&init_state);
+                info!("Validation:\n{}", c);
+            }
+            solutions.push(solution.clone());
+            solutionset.insert(solution);
+        };
 
     let found = |cube: &Cube, ops: &Ops, cubes_from_goal: &BTreeMap<Cube, Ops>| -> Option<Ops> {
         if exact {
@@ -148,7 +154,7 @@ fn solve(
             }
             cubes_from_start.insert(c.clone(), ops.clone());
             if let Some(solution) = found(&c, &ops, &cubes_from_goal) {
-                add_solution(&mut solutions, solution);
+                add_solution(&mut solutions, &mut solutionset, solution.shorten());
                 continue;
             }
         } else {
@@ -160,7 +166,7 @@ fn solve(
             }
             cubes_from_goal.insert(c.clone(), ops.clone());
             if let Some(solution) = found_reverse(&c, &ops, &cubes_from_start) {
-                add_solution(&mut solutions, solution);
+                add_solution(&mut solutions, &mut solutionset, solution.shorten());
                 continue;
             }
         }
