@@ -15,6 +15,30 @@ fn search_one(
     algs.get(0).cloned()
 }
 
+fn search_any(
+    init_state: &Cube,
+    goal: &Cube,
+    ways: Vec<(Vec<Operation>, usize)>,
+    verbose: bool,
+    better_length: usize,
+) -> Option<Ops> {
+    let mut min_length = 999;
+    let mut ret = None;
+    for (allowed_ops, max_depth) in ways {
+        let algs = search(init_state, goal, allowed_ops, max_depth, 1, verbose);
+        if let Some(alg) = algs.get(0).map(|alg| alg.expand().shorten()) {
+            if alg.len() <= better_length {
+                return Some(alg);
+            }
+            if alg.len() < min_length {
+                min_length = alg.len();
+                ret = Some(alg);
+            }
+        }
+    }
+    ret
+}
+
 pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let mut cube = cube.clone();
     let mut algorithm = Ops::default();
@@ -257,8 +281,6 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         W W W ;
         W W W ;
     ];
-    info!("PLL/MU");
-    let allowed_ops = vec![Up(true), Up(false), Middle(true), Middle(false)];
     let sexy = Operation::Compound(
         "Sx".to_string(),
         true,
@@ -272,56 +294,108 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let jb = Operation::Compound(
         "Jb".to_string(),
         true,
-        read::parse_ops(&"RUR'F'RUR'U'R'FR2U'R'").unwrap().1.data,
+        read::parse_ops(&"RUR'F' RUR'U' R'FR2U'R'").unwrap().1.data,
     );
-    match search_one(&cube, &subgoal, allowed_ops, 7, verbose) {
+    let ja = Operation::Compound(
+        "Ja".to_string(),
+        true,
+        read::parse_ops(&"L'U'LF L'U'LU LF'L2UL").unwrap().1.data,
+    );
+    let f = Operation::Compound(
+        "F".to_string(),
+        true,
+        read::parse_ops(&"R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R")
+            .unwrap()
+            .1
+            .data,
+    );
+    let gb = Operation::Compound(
+        "Gb".to_string(),
+        true,
+        read::parse_ops(&"R' U' R U D' R2 U R' U R U' R U' R2 D")
+            .unwrap()
+            .1
+            .data,
+    );
+    let gd = Operation::Compound(
+        "Gd".to_string(),
+        true,
+        read::parse_ops(&"R U R' U' D R2 U' R U' R' U R' U R2 D'")
+            .unwrap()
+            .1
+            .data,
+    );
+    let na = Operation::Compound(
+        "Na".to_string(),
+        true,
+        read::parse_ops(&"z U R' D R2 U' R D' U R' D R2 U' R D' z'")
+            .unwrap()
+            .1
+            .data,
+    );
+    let nb = Operation::Compound(
+        "Nb".to_string(),
+        true,
+        read::parse_ops(&"R' U R U' R' F' U' F R U R' F R' F' R U' R")
+            .unwrap()
+            .1
+            .data,
+    );
+    let aa = Operation::Compound(
+        "Aa".to_string(),
+        true,
+        read::parse_ops(&"x L2 D2 L' U' L D2 L' U L' x'")
+            .unwrap()
+            .1
+            .data,
+    );
+    let ra = Operation::Compound(
+        "Ra".to_string(),
+        true,
+        read::parse_ops(&"R U' R' U' R U R D R' U' R D' R' U2 R'")
+            .unwrap()
+            .1
+            .data,
+    );
+    let rb = Operation::Compound(
+        "Rb".to_string(),
+        true,
+        read::parse_ops(&"R2 F R U R U' R' F' R U2 R' U2 R")
+            .unwrap()
+            .1
+            .data,
+    );
+    let ways = vec![
+        (vec![Up(true), Up(false), Middle(true), Middle(false)], 7),
+        (vec![Up(true), Up(false), Right(true), Right(false), f], 5),
+        (vec![Up(true), Up(false), jb], 5),
+        (vec![Up(true), Up(false), ja], 5),
+        (vec![Up(true), Up(false), gb], 4),
+        (vec![Up(true), Up(false), gd], 4),
+        (vec![Up(true), Up(false), na], 4),
+        (vec![Up(true), Up(false), nb], 4),
+        (vec![Up(true), Up(false), aa], 4),
+        (vec![Up(true), Up(false), ra], 4),
+        (vec![Up(true), Up(false), rb], 4),
+        (
+            vec![
+                Up(true),
+                Up(false),
+                sexy.clone(),
+                sexy.rev(),
+                sledgehammer.clone(),
+                sledgehammer.rev(),
+            ],
+            7,
+        ),
+    ];
+    match search_any(&cube, &subgoal, ways, verbose, 23) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
         }
         None => {
-            info!("PLL/RUF+Sx+Sh+Jb");
-            let allowed_ops = vec![
-                Up(true),
-                Up(false),
-                Front(true),
-                Front(false),
-                Right(true),
-                Right(false),
-                sexy.clone(),
-                sexy.rev(),
-                sledgehammer.clone(),
-                sledgehammer.rev(),
-                jb,
-            ];
-            match search_one(&cube, &subgoal, allowed_ops, 5, verbose) {
-                Some(alg) => {
-                    algorithm.extend(&alg);
-                    cube = alg.apply(&cube);
-                }
-                None => {
-                    // This can solve all PLL speedy!!
-                    // But this may be unreachable...
-                    info!("PLL/U+Sx+Sh");
-                    let allowed_ops = vec![
-                        Up(true),
-                        Up(false),
-                        sexy.clone(),
-                        sexy.rev(),
-                        sledgehammer.clone(),
-                        sledgehammer.rev(),
-                    ];
-                    match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
-                        Some(alg) => {
-                            algorithm.extend(&alg);
-                            cube = alg.apply(&cube);
-                        }
-                        None => {
-                            return None;
-                        }
-                    }
-                }
-            }
+            return None;
         }
     }
 

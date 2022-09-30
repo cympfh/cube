@@ -193,25 +193,6 @@ fn solve(
             if last_repeat == Some(op.clone()) {
                 continue;
             }
-            // Too heavy Compound
-            if let Compound(_, _, operations) = op {
-                if operations.len() > 10 {
-                    if !from_start {
-                        continue;
-                    }
-                    let mut skip = false;
-                    for op in ops.data.iter() {
-                        if let Compound(_, _, operations) = op {
-                            if operations.len() > 10 {
-                                skip = true;
-                            }
-                        }
-                    }
-                    if skip {
-                        continue;
-                    }
-                }
-            }
             let mut c = c.clone();
             c.apply(op);
             let mut ops = ops.clone();

@@ -20,12 +20,14 @@ benchmark-init:
 	@cargo build --release
 
 benchmark-roux: benchmark-init
-	@hyperfine -r 20 'cargo run --release -- -q --roux < tests/random/1'
-	@hyperfine -r 20 'cargo run --release -- -q --roux < tests/random/2'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/1'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/2'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/3'
 
 benchmark-cfop: benchmark-init
-	@hyperfine -r 5 'cargo run --release -- -q --cfop < tests/random/1'
-	@hyperfine -r 5 'cargo run --release -- -q --cfop < tests/random/2'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/1'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/2'
+	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/3'
 
 test:
 	cargo test
