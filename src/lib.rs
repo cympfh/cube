@@ -12,10 +12,17 @@ pub fn solve(
     max_depth: usize,
     num: usize,
     solve_by_roux: bool,
+    solve_by_cfop: bool,
 ) -> String {
     let (init, goal) = read::read(input);
     if solve_by_roux {
         if let Some(alg) = solver::roux(&init, false) {
+            format!("{}", alg)
+        } else {
+            String::from("(failed:no_solutions)")
+        }
+    } else if solve_by_cfop {
+        if let Some(alg) = solver::cfop(&init, false) {
             format!("{}", alg)
         } else {
             String::from("(failed:no_solutions)")
@@ -52,7 +59,7 @@ mod test_operation {
             }
         ";
         let allow_ops = "D U";
-        let solutions = solve(&input, &allow_ops, 3, 1, false);
+        let solutions = solve(&input, &allow_ops, 3, 1, false, false);
         assert_ne!(solutions, String::from(""));
         assert!(!solutions.as_str().starts_with("(failed"));
     }
@@ -64,7 +71,19 @@ mod test_operation {
               U' F B
             }
         ";
-        let solutions = solve(&input, "", 0, 0, true);
+        let solutions = solve(&input, "", 0, 0, true, false);
+        assert_ne!(solutions, String::from(""));
+        assert!(!solutions.as_str().starts_with("(failed"));
+    }
+
+    #[test]
+    fn test_solve_cfop() {
+        let input = "
+            Scramble {
+              U' F B
+            }
+        ";
+        let solutions = solve(&input, "", 0, 0, false, true);
         assert_ne!(solutions, String::from(""));
         assert!(!solutions.as_str().starts_with("(failed"));
     }

@@ -1,25 +1,5 @@
 # N-perm (a)
 
-Init {
-  YYY
-  YYY
-  YYY
-  BGGORRGBBROO
-  BBBRRRGGGOOO
-  BBBRRRGGGOOO
-  WWW
-  WWW
-  WWW
-}
-
-Goal {
-  YYY
-  YYY
-  YYY
-  BBBRRRGGGOOO
-  BBBRRRGGGOOO
-  BBBRRRGGGOOO
-  WWW
-  WWW
-  WWW
+Scramble {
+  R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'
 }

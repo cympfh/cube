@@ -1,5 +1,7 @@
 use crate::entities::{Color, Face, FaceIndex, Operation};
 use crate::rotate;
+use crate::util;
+use std::collections::BTreeSet;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cube {
@@ -74,6 +76,55 @@ impl Cube {
             || self.front.has_wildcard()
             || self.back.has_wildcard()
     }
+    /// Replace with Color::Other
+    pub fn mask(&mut self, mask_cube: &Cube) {
+        let mut cx = BTreeSet::new();
+        for c in util::centers().iter() {
+            cx.insert(mask_cube[c.0].at(c.1, c.2));
+        }
+        for c in util::centers().iter() {
+            if !cx.contains(&self[c.0].at(c.1, c.2)) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+            }
+        }
+        let mut cx = BTreeSet::new();
+        for (c, d) in util::edges().iter() {
+            let mut v = vec![mask_cube[c.0].at(c.1, c.2), mask_cube[d.0].at(d.1, d.2)];
+            v.sort();
+            cx.insert(v);
+        }
+        for (c, d) in util::edges().iter() {
+            let mut v = vec![self[c.0].at(c.1, c.2), self[d.0].at(d.1, d.2)];
+            v.sort();
+            if !cx.contains(&v) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+                self[d.0][(d.1, d.2)] = Color::Other;
+            }
+        }
+        let mut cx = BTreeSet::new();
+        for (c, d, e) in util::corners().iter() {
+            let mut v = vec![
+                mask_cube[c.0].at(c.1, c.2),
+                mask_cube[d.0].at(d.1, d.2),
+                mask_cube[e.0].at(e.1, e.2),
+            ];
+            v.sort();
+            cx.insert(v);
+        }
+        for (c, d, e) in util::corners().iter() {
+            let mut v = vec![
+                self[c.0].at(c.1, c.2),
+                self[d.0].at(d.1, d.2),
+                self[e.0].at(e.1, e.2),
+            ];
+            v.sort();
+            if !cx.contains(&v) {
+                self[c.0][(c.1, c.2)] = Color::Other;
+                self[d.0][(d.1, d.2)] = Color::Other;
+                self[e.0][(e.1, e.2)] = Color::Other;
+            }
+        }
+    }
 }
 
 impl std::fmt::Display for Cube {
@@ -100,10 +151,10 @@ impl std::fmt::Display for Cube {
 }
 
 impl Cube {
-    pub fn apply(&mut self, op: Operation) {
+    pub fn apply(&mut self, op: &Operation) {
         use Operation::*;
         match op {
-            Up(clockwise) => {
+            &Up(clockwise) => {
                 self.up.rotate(clockwise);
                 rotate!(
                     if clockwise { 9 } else { 3 },
@@ -123,7 +174,7 @@ impl Cube {
                     ]
                 );
             }
-            Down(clockwise) => {
+            &Down(clockwise) => {
                 self.down.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -143,7 +194,7 @@ impl Cube {
                     ]
                 );
             }
-            Front(clockwise) => {
+            &Front(clockwise) => {
                 self.front.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -163,7 +214,7 @@ impl Cube {
                     ]
                 );
             }
-            Back(clockwise) => {
+            &Back(clockwise) => {
                 self.back.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -183,7 +234,7 @@ impl Cube {
                     ]
                 );
             }
-            Left(clockwise) => {
+            &Left(clockwise) => {
                 self.left.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -203,7 +254,7 @@ impl Cube {
                     ]
                 );
             }
-            Right(clockwise) => {
+            &Right(clockwise) => {
                 self.right.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -223,31 +274,31 @@ impl Cube {
                     ]
                 );
             }
-            UpDouble(clockwise) => {
-                self.apply(Up(clockwise));
-                self.apply(Equator(!clockwise));
+            &UpDouble(clockwise) => {
+                self.apply(&Up(clockwise));
+                self.apply(&Equator(!clockwise));
             }
-            DownDouble(clockwise) => {
-                self.apply(Down(clockwise));
-                self.apply(Equator(clockwise));
+            &DownDouble(clockwise) => {
+                self.apply(&Down(clockwise));
+                self.apply(&Equator(clockwise));
             }
-            FrontDouble(clockwise) => {
-                self.apply(Front(clockwise));
-                self.apply(Standing(clockwise));
+            &FrontDouble(clockwise) => {
+                self.apply(&Front(clockwise));
+                self.apply(&Standing(clockwise));
             }
-            BackDouble(clockwise) => {
-                self.apply(Back(clockwise));
-                self.apply(Standing(!clockwise));
+            &BackDouble(clockwise) => {
+                self.apply(&Back(clockwise));
+                self.apply(&Standing(!clockwise));
             }
-            LeftDouble(clockwise) => {
-                self.apply(Left(clockwise));
-                self.apply(Middle(clockwise));
+            &LeftDouble(clockwise) => {
+                self.apply(&Left(clockwise));
+                self.apply(&Middle(clockwise));
             }
-            RightDouble(clockwise) => {
-                self.apply(Right(clockwise));
-                self.apply(Middle(!clockwise));
+            &RightDouble(clockwise) => {
+                self.apply(&Right(clockwise));
+                self.apply(&Middle(!clockwise));
             }
-            Middle(clockwise) => {
+            &Middle(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -266,7 +317,7 @@ impl Cube {
                     ]
                 );
             }
-            Equator(clockwise) => {
+            &Equator(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -285,7 +336,7 @@ impl Cube {
                     ]
                 );
             }
-            Standing(clockwise) => {
+            &Standing(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -304,20 +355,30 @@ impl Cube {
                     ]
                 );
             }
-            X(clockwise) => {
-                self.apply(Right(clockwise));
-                self.apply(Middle(!clockwise));
-                self.apply(Left(!clockwise));
+            &X(clockwise) => {
+                self.apply(&Right(clockwise));
+                self.apply(&Middle(!clockwise));
+                self.apply(&Left(!clockwise));
             }
-            Y(clockwise) => {
-                self.apply(Up(clockwise));
-                self.apply(Equator(!clockwise));
-                self.apply(Down(!clockwise));
+            &Y(clockwise) => {
+                self.apply(&Up(clockwise));
+                self.apply(&Equator(!clockwise));
+                self.apply(&Down(!clockwise));
             }
-            Z(clockwise) => {
-                self.apply(Front(clockwise));
-                self.apply(Standing(clockwise));
-                self.apply(Back(!clockwise));
+            &Z(clockwise) => {
+                self.apply(&Front(clockwise));
+                self.apply(&Standing(clockwise));
+                self.apply(&Back(!clockwise));
+            }
+            Compound(_, true, operations) => {
+                for op in operations.iter() {
+                    self.apply(op);
+                }
+            }
+            Compound(_, false, operations) => {
+                for op in operations.iter().rev() {
+                    self.apply(&op.rev());
+                }
             }
         }
     }
@@ -408,7 +469,7 @@ mod test_cube {
         ];
         {
             let mut c = solved_cube.clone();
-            c.apply(Front(true));
+            c.apply(&Front(true));
             let d = cube![
                 Y Y Y;
                 Y Y Y;
@@ -424,7 +485,7 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Back(true));
+            c.apply(&Back(true));
             let d = cube![
                 G G G ;
                 Y Y Y ;
@@ -440,8 +501,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Right(true));
-            c.apply(Back(true));
+            c.apply(&Right(true));
+            c.apply(&Back(true));
             let d = cube![
                 G G G ;
                 Y Y R ;
@@ -457,8 +518,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Front(true));
-            c.apply(Left(true));
+            c.apply(&Front(true));
+            c.apply(&Left(true));
             let d = cube![
                 O Y Y ;
                 O Y Y ;
@@ -474,8 +535,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Left(true));
-            c.apply(Down(true));
+            c.apply(&Left(true));
+            c.apply(&Down(true));
             let d = cube![
                 O Y Y ;
                 O Y Y ;
@@ -491,7 +552,7 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Z(true));
+            c.apply(&Z(true));
             let d = cube![
                 B B B ;
                 B B B ;
@@ -507,9 +568,9 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Z(true));
-            c.apply(X(true));
-            c.apply(Z(false));
+            c.apply(&Z(true));
+            c.apply(&X(true));
+            c.apply(&Z(false));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -541,7 +602,7 @@ mod test_cube {
         ];
         {
             let mut c = c.clone();
-            c.apply(X(true));
+            c.apply(&X(true));
             let d = cube![
                 R R O ;
                 O O Y ;
@@ -557,7 +618,7 @@ mod test_cube {
         }
         {
             let mut c = c.clone();
-            c.apply(Y(true));
+            c.apply(&Y(true));
             let d = cube![
                 B B Y ;
                 B W R ;
@@ -573,7 +634,7 @@ mod test_cube {
         }
         {
             let mut c = c.clone();
-            c.apply(Z(true));
+            c.apply(&Z(true));
             let d = cube![
                 B B G ;
                 B B Y ;
@@ -641,21 +702,21 @@ mod test_cube {
         {
             // J-perm
             let mut c = c.clone();
-            c.apply(Right(true));
-            c.apply(Up(true));
-            c.apply(Right(false));
-            c.apply(Front(false));
-            c.apply(Right(true));
-            c.apply(Up(true));
-            c.apply(Right(false));
-            c.apply(Up(false));
-            c.apply(Right(false));
-            c.apply(Front(true));
-            c.apply(Right(true));
-            c.apply(Right(true));
-            c.apply(Up(false));
-            c.apply(Right(false));
-            c.apply(Up(false));
+            c.apply(&Right(true));
+            c.apply(&Up(true));
+            c.apply(&Right(false));
+            c.apply(&Front(false));
+            c.apply(&Right(true));
+            c.apply(&Up(true));
+            c.apply(&Right(false));
+            c.apply(&Up(false));
+            c.apply(&Right(false));
+            c.apply(&Front(true));
+            c.apply(&Right(true));
+            c.apply(&Right(true));
+            c.apply(&Up(false));
+            c.apply(&Right(false));
+            c.apply(&Up(false));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -672,19 +733,19 @@ mod test_cube {
         {
             // Z-perm
             let mut c = c.clone();
-            c.apply(Middle(false));
-            c.apply(Up(false));
+            c.apply(&Middle(false));
+            c.apply(&Up(false));
             for _ in 0..2 {
-                c.apply(Middle(false));
-                c.apply(Middle(false));
-                c.apply(Up(false));
+                c.apply(&Middle(false));
+                c.apply(&Middle(false));
+                c.apply(&Up(false));
             }
-            c.apply(Middle(false));
-            c.apply(Up(false));
-            c.apply(Up(false));
-            c.apply(Middle(false));
-            c.apply(Middle(false));
-            c.apply(Up(true));
+            c.apply(&Middle(false));
+            c.apply(&Up(false));
+            c.apply(&Up(false));
+            c.apply(&Middle(false));
+            c.apply(&Middle(false));
+            c.apply(&Up(true));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -712,22 +773,22 @@ mod test_cube {
             W W W ;
             W W W ;
         ];
-        c.apply(Right(false));
-        c.apply(Front(true));
-        c.apply(Right(true));
-        c.apply(Front(false));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
-        c.apply(Up(true));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
-        c.apply(Up(false));
-        c.apply(Up(false));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
+        c.apply(&Right(false));
+        c.apply(&Front(true));
+        c.apply(&Right(true));
+        c.apply(&Front(false));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
+        c.apply(&Up(true));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
+        c.apply(&Up(false));
+        c.apply(&Up(false));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
         let d = cube![
             * * * ;
             * * * ;

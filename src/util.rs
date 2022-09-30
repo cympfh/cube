@@ -124,3 +124,16 @@ pub fn edges() -> Vec<Edge> {
         ((Down, 2, 1), (Back, 2, 1)),
     ]
 }
+
+pub type Center = (FaceIndex, usize, usize);
+pub fn centers() -> Vec<Center> {
+    use FaceIndex::*;
+    vec![
+        (Front, 1, 1),
+        (Back, 1, 1),
+        (Up, 1, 1),
+        (Down, 1, 1),
+        (Left, 1, 1),
+        (Right, 1, 1),
+    ]
+}

@@ -2,7 +2,7 @@ use crate::entities::Cube;
 
 /// https://tribox.com/3x3x3/solution/notation/
 /// Omit: E and S
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Operation {
     Up(bool), // clockwise?
     Down(bool),
@@ -22,6 +22,7 @@ pub enum Operation {
     X(bool),
     Y(bool),
     Z(bool),
+    Compound(String, bool, Vec<Operation>),
 }
 
 impl Operation {
@@ -46,6 +47,9 @@ impl Operation {
             X(clockwise) => X(!clockwise),
             Y(clockwise) => Y(!clockwise),
             Z(clockwise) => Z(!clockwise),
+            Compound(name, clockwise, operations) => {
+                Compound(name.clone(), !clockwise, operations.clone())
+            }
         }
     }
     pub fn is_reversed(&self) -> bool {
@@ -69,6 +73,7 @@ impl Operation {
             X(clockwise) => !clockwise,
             Y(clockwise) => !clockwise,
             Z(clockwise) => !clockwise,
+            Compound(_, clockwise, _) => !clockwise,
         }
     }
 }
@@ -76,10 +81,11 @@ impl Operation {
 impl std::fmt::Display for Operation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Operation::*;
+        let note;
         write!(
             f,
             "{}",
-            match *self {
+            match self {
                 Up(true) => "U",
                 Up(false) => "U'",
                 Down(true) => "D",
@@ -116,6 +122,14 @@ impl std::fmt::Display for Operation {
                 Y(false) => "y'",
                 Z(true) => "z",
                 Z(false) => "z'",
+                Compound(name, true, _) => {
+                    note = format!("({})", name.to_string());
+                    &note
+                }
+                Compound(name, false, _) => {
+                    note = format!("({})'", name.to_string());
+                    &note
+                }
             }
         )
     }
@@ -140,6 +154,17 @@ impl Ops {
     pub fn len(&self) -> usize {
         self.data.len()
     }
+    /// length of expanded
+    pub fn weight(&self) -> usize {
+        use Operation::*;
+        self.data
+            .iter()
+            .map(|op| match op {
+                Compound(_, _, operations) => operations.len(),
+                _ => 1,
+            })
+            .sum::<usize>()
+    }
     pub fn last(&self) -> Option<Operation> {
         self.data.last().cloned()
     }
@@ -147,39 +172,59 @@ impl Ops {
     pub fn last_repeat(&self) -> Option<Operation> {
         let n = self.data.len();
         if n >= 2 && self.data[n - 2] == self.data[n - 1] {
-            Some(self.data[n - 1])
+            Some(self.data[n - 1].clone())
         } else {
             None
         }
     }
     pub fn rev(&self) -> Self {
         let mut reversed = vec![];
-        for &op in self.data.iter().rev() {
+        for op in self.data.iter().rev() {
             reversed.push(op.rev());
         }
         Self { data: reversed }
     }
     pub fn extend(&mut self, other: &Ops) {
-        for &op in other.data.iter() {
-            self.data.push(op);
+        for op in other.data.iter() {
+            self.data.push(op.clone());
         }
     }
     pub fn apply(&self, cube: &Cube) -> Cube {
         let mut c = cube.clone();
-        for &op in self.data.iter() {
+        for op in self.data.iter() {
             c.apply(op);
         }
         c
     }
+    pub fn expand(&self) -> Self {
+        use Operation::*;
+        let mut ops = Ops::default();
+        for op in self.data.iter() {
+            match op {
+                Compound(_, true, operations) => {
+                    for op in operations.iter() {
+                        ops.push(op.clone());
+                    }
+                }
+                Compound(_, false, operations) => {
+                    for op in operations.iter().rev() {
+                        ops.push(op.rev());
+                    }
+                }
+                _ => ops.push(op.clone()),
+            }
+        }
+        ops
+    }
     pub fn shorten(&self) -> Self {
         let mut ops = Ops::default();
-        for &op in self.data.iter() {
-            ops.push(op);
+        for op in self.data.iter() {
+            ops.push(op.clone());
             let m = ops.len();
             if m >= 3 {
-                let a = ops.data[m - 1];
-                let b = ops.data[m - 2];
-                let c = ops.data[m - 3];
+                let a = ops.data[m - 1].clone();
+                let b = ops.data[m - 2].clone();
+                let c = ops.data[m - 3].clone();
                 if a == b && a == c {
                     ops.pop();
                     ops.pop();
@@ -189,8 +234,8 @@ impl Ops {
             }
             let m = ops.len();
             if m >= 2 {
-                let a = ops.data[m - 1];
-                let b = ops.data[m - 2];
+                let a = ops.data[m - 1].clone();
+                let b = ops.data[m - 2].clone();
                 if a == b.rev() {
                     ops.pop();
                     ops.pop();

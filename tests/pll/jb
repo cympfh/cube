@@ -1,26 +1,5 @@
 # J-perm b
-# cube -FRU < tests/pll/jb
 
-Init {
-  YYY
-  YYY
-  YYY
-  OBBROOBRRGGG
-  OOOBBBRRRGGG
-  OOOBBBRRRGGG
-  WWW
-  WWW
-  WWW
-}
-
-Goal {
-  YYY
-  YYY
-  YYY
-  OOOBBBRRRGGG
-  OOOBBBRRRGGG
-  OOOBBBRRRGGG
-  WWW
-  WWW
-  WWW
+Scramble {
+  R U R' F' R U R' U' R' F R2 U' R' U'
 }
