@@ -469,7 +469,7 @@ mod test_cube {
         ];
         {
             let mut c = solved_cube.clone();
-            c.apply(Front(true));
+            c.apply(&Front(true));
             let d = cube![
                 Y Y Y;
                 Y Y Y;
@@ -485,7 +485,7 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Back(true));
+            c.apply(&Back(true));
             let d = cube![
                 G G G ;
                 Y Y Y ;
@@ -501,8 +501,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Right(true));
-            c.apply(Back(true));
+            c.apply(&Right(true));
+            c.apply(&Back(true));
             let d = cube![
                 G G G ;
                 Y Y R ;
@@ -518,8 +518,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Front(true));
-            c.apply(Left(true));
+            c.apply(&Front(true));
+            c.apply(&Left(true));
             let d = cube![
                 O Y Y ;
                 O Y Y ;
@@ -535,8 +535,8 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Left(true));
-            c.apply(Down(true));
+            c.apply(&Left(true));
+            c.apply(&Down(true));
             let d = cube![
                 O Y Y ;
                 O Y Y ;
@@ -552,7 +552,7 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Z(true));
+            c.apply(&Z(true));
             let d = cube![
                 B B B ;
                 B B B ;
@@ -568,9 +568,9 @@ mod test_cube {
         }
         {
             let mut c = solved_cube.clone();
-            c.apply(Z(true));
-            c.apply(X(true));
-            c.apply(Z(false));
+            c.apply(&Z(true));
+            c.apply(&X(true));
+            c.apply(&Z(false));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -602,7 +602,7 @@ mod test_cube {
         ];
         {
             let mut c = c.clone();
-            c.apply(X(true));
+            c.apply(&X(true));
             let d = cube![
                 R R O ;
                 O O Y ;
@@ -618,7 +618,7 @@ mod test_cube {
         }
         {
             let mut c = c.clone();
-            c.apply(Y(true));
+            c.apply(&Y(true));
             let d = cube![
                 B B Y ;
                 B W R ;
@@ -634,7 +634,7 @@ mod test_cube {
         }
         {
             let mut c = c.clone();
-            c.apply(Z(true));
+            c.apply(&Z(true));
             let d = cube![
                 B B G ;
                 B B Y ;
@@ -702,21 +702,21 @@ mod test_cube {
         {
             // J-perm
             let mut c = c.clone();
-            c.apply(Right(true));
-            c.apply(Up(true));
-            c.apply(Right(false));
-            c.apply(Front(false));
-            c.apply(Right(true));
-            c.apply(Up(true));
-            c.apply(Right(false));
-            c.apply(Up(false));
-            c.apply(Right(false));
-            c.apply(Front(true));
-            c.apply(Right(true));
-            c.apply(Right(true));
-            c.apply(Up(false));
-            c.apply(Right(false));
-            c.apply(Up(false));
+            c.apply(&Right(true));
+            c.apply(&Up(true));
+            c.apply(&Right(false));
+            c.apply(&Front(false));
+            c.apply(&Right(true));
+            c.apply(&Up(true));
+            c.apply(&Right(false));
+            c.apply(&Up(false));
+            c.apply(&Right(false));
+            c.apply(&Front(true));
+            c.apply(&Right(true));
+            c.apply(&Right(true));
+            c.apply(&Up(false));
+            c.apply(&Right(false));
+            c.apply(&Up(false));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -733,19 +733,19 @@ mod test_cube {
         {
             // Z-perm
             let mut c = c.clone();
-            c.apply(Middle(false));
-            c.apply(Up(false));
+            c.apply(&Middle(false));
+            c.apply(&Up(false));
             for _ in 0..2 {
-                c.apply(Middle(false));
-                c.apply(Middle(false));
-                c.apply(Up(false));
+                c.apply(&Middle(false));
+                c.apply(&Middle(false));
+                c.apply(&Up(false));
             }
-            c.apply(Middle(false));
-            c.apply(Up(false));
-            c.apply(Up(false));
-            c.apply(Middle(false));
-            c.apply(Middle(false));
-            c.apply(Up(true));
+            c.apply(&Middle(false));
+            c.apply(&Up(false));
+            c.apply(&Up(false));
+            c.apply(&Middle(false));
+            c.apply(&Middle(false));
+            c.apply(&Up(true));
             let d = cube![
                 Y Y Y ;
                 Y Y Y ;
@@ -773,22 +773,22 @@ mod test_cube {
             W W W ;
             W W W ;
         ];
-        c.apply(Right(false));
-        c.apply(Front(true));
-        c.apply(Right(true));
-        c.apply(Front(false));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
-        c.apply(Up(true));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
-        c.apply(Up(false));
-        c.apply(Up(false));
-        c.apply(Right(true));
-        c.apply(Up(false));
-        c.apply(Right(false));
+        c.apply(&Right(false));
+        c.apply(&Front(true));
+        c.apply(&Right(true));
+        c.apply(&Front(false));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
+        c.apply(&Up(true));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
+        c.apply(&Up(false));
+        c.apply(&Up(false));
+        c.apply(&Right(true));
+        c.apply(&Up(false));
+        c.apply(&Right(false));
         let d = cube![
             * * * ;
             * * * ;
