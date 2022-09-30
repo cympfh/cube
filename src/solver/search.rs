@@ -40,17 +40,17 @@ fn xyz(state: &Cube) -> BTreeMap<Cube, Ops> {
         if ops.len() < MAX_DEPTH {
             let last = ops.last();
             let last_repeat = ops.last_repeat();
-            for &op in ALLOWED_OPS.iter() {
+            for op in ALLOWED_OPS.iter() {
                 if last == Some(op.rev()) {
                     continue;
                 }
-                if last_repeat == Some(op) {
+                if last_repeat == Some(op.clone()) {
                     continue;
                 }
                 let mut c = c.clone();
                 c.apply(op);
                 let mut ops = ops.clone();
-                ops.push(op);
+                ops.push(op.clone());
                 q.push_back((c, ops));
             }
         }
@@ -180,38 +180,42 @@ fn solve(
         }
         let last = ops.last();
         let last_repeat = ops.last_repeat();
-        for &op in allowed_ops.iter() {
+        for op in allowed_ops.iter() {
             // Dont Canceling Move (e.g. UU')
             if last == Some(op.rev()) {
                 continue;
             }
             // Dont repeat Reverse Move (e.g. U'U' is same to UU)
-            if last == Some(op) && op.is_reversed() == from_start {
+            if last == Some(op.clone()) && op.is_reversed() == from_start {
                 continue;
             }
             // Dont repeat 3 times (e.g. UUU is same to U')
-            if last_repeat == Some(op) {
+            if last_repeat == Some(op.clone()) {
                 continue;
             }
-            // Jb is too heavy
-            if let Jb(_) = op {
-                if !from_start {
-                    continue;
-                }
-                let mut skip = false;
-                for &op in ops.data.iter() {
-                    if let Jb(_) = op {
-                        skip = true;
+            // Too heavy Compound
+            if let Compound(_, _, operations) = op {
+                if operations.len() > 10 {
+                    if !from_start {
+                        continue;
                     }
-                }
-                if skip {
-                    continue;
+                    let mut skip = false;
+                    for op in ops.data.iter() {
+                        if let Compound(_, _, operations) = op {
+                            if operations.len() > 10 {
+                                skip = true;
+                            }
+                        }
+                    }
+                    if skip {
+                        continue;
+                    }
                 }
             }
             let mut c = c.clone();
             c.apply(op);
             let mut ops = ops.clone();
-            ops.push(op);
+            ops.push(op.clone());
             q.push((Reverse((ops.weight(), from_start)), c, ops, from_start));
         }
     }

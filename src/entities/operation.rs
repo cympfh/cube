@@ -2,7 +2,7 @@ use crate::entities::Cube;
 
 /// https://tribox.com/3x3x3/solution/notation/
 /// Omit: E and S
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Operation {
     Up(bool), // clockwise?
     Down(bool),
@@ -22,9 +22,7 @@ pub enum Operation {
     X(bool),
     Y(bool),
     Z(bool),
-    Sexy(bool),
-    SledgeHammer(bool),
-    Jb(bool),
+    Compound(String, bool, Vec<Operation>),
 }
 
 impl Operation {
@@ -49,9 +47,9 @@ impl Operation {
             X(clockwise) => X(!clockwise),
             Y(clockwise) => Y(!clockwise),
             Z(clockwise) => Z(!clockwise),
-            Sexy(clockwise) => Sexy(!clockwise),
-            SledgeHammer(clockwise) => SledgeHammer(!clockwise),
-            Jb(clockwise) => Jb(!clockwise),
+            Compound(name, clockwise, operations) => {
+                Compound(name.clone(), !clockwise, operations.clone())
+            }
         }
     }
     pub fn is_reversed(&self) -> bool {
@@ -75,9 +73,7 @@ impl Operation {
             X(clockwise) => !clockwise,
             Y(clockwise) => !clockwise,
             Z(clockwise) => !clockwise,
-            Sexy(clockwise) => !clockwise,
-            SledgeHammer(clockwise) => !clockwise,
-            Jb(clockwise) => !clockwise,
+            Compound(_, clockwise, _) => !clockwise,
         }
     }
 }
@@ -85,10 +81,11 @@ impl Operation {
 impl std::fmt::Display for Operation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Operation::*;
+        let note;
         write!(
             f,
             "{}",
-            match *self {
+            match self {
                 Up(true) => "U",
                 Up(false) => "U'",
                 Down(true) => "D",
@@ -125,12 +122,14 @@ impl std::fmt::Display for Operation {
                 Y(false) => "y'",
                 Z(true) => "z",
                 Z(false) => "z'",
-                Sexy(true) => "(Sx)",
-                Sexy(false) => "(Sx)'",
-                SledgeHammer(true) => "(SH)",
-                SledgeHammer(false) => "(SH)'",
-                Jb(true) => "(Jb)",
-                Jb(false) => "(Jb)'",
+                Compound(name, true, _) => {
+                    note = format!("({})", name.to_string());
+                    &note
+                }
+                Compound(name, false, _) => {
+                    note = format!("({})'", name.to_string());
+                    &note
+                }
             }
         )
     }
@@ -161,9 +160,7 @@ impl Ops {
         self.data
             .iter()
             .map(|op| match op {
-                Sexy(_) => 4,
-                SledgeHammer(_) => 4,
-                Jb(_) => 14,
+                Compound(_, _, operations) => operations.len(),
                 _ => 1,
             })
             .sum::<usize>()
@@ -175,26 +172,26 @@ impl Ops {
     pub fn last_repeat(&self) -> Option<Operation> {
         let n = self.data.len();
         if n >= 2 && self.data[n - 2] == self.data[n - 1] {
-            Some(self.data[n - 1])
+            Some(self.data[n - 1].clone())
         } else {
             None
         }
     }
     pub fn rev(&self) -> Self {
         let mut reversed = vec![];
-        for &op in self.data.iter().rev() {
+        for op in self.data.iter().rev() {
             reversed.push(op.rev());
         }
         Self { data: reversed }
     }
     pub fn extend(&mut self, other: &Ops) {
-        for &op in other.data.iter() {
-            self.data.push(op);
+        for op in other.data.iter() {
+            self.data.push(op.clone());
         }
     }
     pub fn apply(&self, cube: &Cube) -> Cube {
         let mut c = cube.clone();
-        for &op in self.data.iter() {
+        for op in self.data.iter() {
             c.apply(op);
         }
         c
@@ -202,91 +199,32 @@ impl Ops {
     pub fn expand(&self) -> Self {
         use Operation::*;
         let mut ops = Ops::default();
-        for &op in self.data.iter() {
+        for op in self.data.iter() {
             match op {
-                Sexy(true) => {
-                    ops.push(Right(true));
-                    ops.push(Up(true));
-                    ops.push(Right(false));
-                    ops.push(Up(false));
-                }
-                Sexy(false) => {
-                    ops.push(Up(true));
-                    ops.push(Right(true));
-                    ops.push(Up(false));
-                    ops.push(Right(false));
-                }
-                SledgeHammer(true) => {
-                    ops.push(Right(false));
-                    ops.push(Front(true));
-                    ops.push(Right(true));
-                    ops.push(Front(false));
-                }
-                SledgeHammer(false) => {
-                    ops.push(Front(true));
-                    ops.push(Right(false));
-                    ops.push(Front(false));
-                    ops.push(Right(true));
-                }
-                Jb(true) => {
-                    // R U R' F' R U R' U' R' F R2 U' R'
-                    for op in [
-                        Right(true),
-                        Up(true),
-                        Right(false),
-                        Front(false),
-                        Right(true),
-                        Up(true),
-                        Right(false),
-                        Up(false),
-                        Right(false),
-                        Front(true),
-                        Right(true),
-                        Right(true),
-                        Up(false),
-                        Right(false),
-                    ] {
-                        ops.push(op);
+                Compound(_, true, operations) => {
+                    for op in operations.iter() {
+                        ops.push(op.clone());
                     }
                 }
-                Jb(false) => {
-                    // (R U R' F' R U R' U' R' F R2 U' R')'
-                    for op in [
-                        Right(true),
-                        Up(true),
-                        Right(false),
-                        Front(false),
-                        Right(true),
-                        Up(true),
-                        Right(false),
-                        Up(false),
-                        Right(false),
-                        Front(true),
-                        Right(true),
-                        Right(true),
-                        Up(false),
-                        Right(false),
-                    ]
-                    .iter()
-                    .rev()
-                    {
+                Compound(_, false, operations) => {
+                    for op in operations.iter().rev() {
                         ops.push(op.rev());
                     }
                 }
-                _ => ops.push(op),
+                _ => ops.push(op.clone()),
             }
         }
         ops
     }
     pub fn shorten(&self) -> Self {
         let mut ops = Ops::default();
-        for &op in self.data.iter() {
-            ops.push(op);
+        for op in self.data.iter() {
+            ops.push(op.clone());
             let m = ops.len();
             if m >= 3 {
-                let a = ops.data[m - 1];
-                let b = ops.data[m - 2];
-                let c = ops.data[m - 3];
+                let a = ops.data[m - 1].clone();
+                let b = ops.data[m - 2].clone();
+                let c = ops.data[m - 3].clone();
                 if a == b && a == c {
                     ops.pop();
                     ops.pop();
@@ -296,8 +234,8 @@ impl Ops {
             }
             let m = ops.len();
             if m >= 2 {
-                let a = ops.data[m - 1];
-                let b = ops.data[m - 2];
+                let a = ops.data[m - 1].clone();
+                let b = ops.data[m - 2].clone();
                 if a == b.rev() {
                     ops.pop();
                     ops.pop();

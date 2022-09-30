@@ -1,5 +1,6 @@
 use crate::cube;
 use crate::entities::*;
+use crate::read;
 use crate::solver::search;
 use log::info;
 
@@ -258,13 +259,28 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     ];
     info!("PLL/MU");
     let allowed_ops = vec![Up(true), Up(false), Middle(true), Middle(false)];
+    let sexy = Operation::Compound(
+        "Sx".to_string(),
+        true,
+        read::parse_ops(&"RUR'U'").unwrap().1.data,
+    );
+    let sledgehammer = Operation::Compound(
+        "Sh".to_string(),
+        true,
+        read::parse_ops(&"R'FRF'").unwrap().1.data,
+    );
+    let jb = Operation::Compound(
+        "Jb".to_string(),
+        true,
+        read::parse_ops(&"RUR'F'RUR'U'R'FR2U'R'").unwrap().1.data,
+    );
     match search_one(&cube, &subgoal, allowed_ops, 7, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
         }
         None => {
-            info!("PLL/RUF+Jb+Sx+SH");
+            info!("PLL/RUF+Sx+Sh+Jb");
             let allowed_ops = vec![
                 Up(true),
                 Up(false),
@@ -272,13 +288,11 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
                 Front(false),
                 Right(true),
                 Right(false),
-                Down(true),
-                Down(false),
-                Jb(true),
-                Sexy(true),
-                Sexy(false),
-                SledgeHammer(true),
-                SledgeHammer(false),
+                sexy.clone(),
+                sexy.rev(),
+                sledgehammer.clone(),
+                sledgehammer.rev(),
+                jb,
             ];
             match search_one(&cube, &subgoal, allowed_ops, 5, verbose) {
                 Some(alg) => {
@@ -287,14 +301,15 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
                 }
                 None => {
                     // This can solve all PLL speedy!!
-                    info!("PLL/U+Sx+SH");
+                    // But this may be unreachable...
+                    info!("PLL/U+Sx+Sh");
                     let allowed_ops = vec![
                         Up(true),
                         Up(false),
-                        Sexy(true),
-                        Sexy(false),
-                        SledgeHammer(true),
-                        SledgeHammer(false),
+                        sexy.clone(),
+                        sexy.rev(),
+                        sledgehammer.clone(),
+                        sledgehammer.rev(),
                     ];
                     match search_one(&cube, &subgoal, allowed_ops, 6, verbose) {
                         Some(alg) => {

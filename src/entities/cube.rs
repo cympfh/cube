@@ -151,10 +151,10 @@ impl std::fmt::Display for Cube {
 }
 
 impl Cube {
-    pub fn apply(&mut self, op: Operation) {
+    pub fn apply(&mut self, op: &Operation) {
         use Operation::*;
         match op {
-            Up(clockwise) => {
+            &Up(clockwise) => {
                 self.up.rotate(clockwise);
                 rotate!(
                     if clockwise { 9 } else { 3 },
@@ -174,7 +174,7 @@ impl Cube {
                     ]
                 );
             }
-            Down(clockwise) => {
+            &Down(clockwise) => {
                 self.down.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -194,7 +194,7 @@ impl Cube {
                     ]
                 );
             }
-            Front(clockwise) => {
+            &Front(clockwise) => {
                 self.front.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -214,7 +214,7 @@ impl Cube {
                     ]
                 );
             }
-            Back(clockwise) => {
+            &Back(clockwise) => {
                 self.back.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -234,7 +234,7 @@ impl Cube {
                     ]
                 );
             }
-            Left(clockwise) => {
+            &Left(clockwise) => {
                 self.left.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -254,7 +254,7 @@ impl Cube {
                     ]
                 );
             }
-            Right(clockwise) => {
+            &Right(clockwise) => {
                 self.right.rotate(clockwise);
                 rotate!(
                     if clockwise { 3 } else { 9 },
@@ -274,31 +274,31 @@ impl Cube {
                     ]
                 );
             }
-            UpDouble(clockwise) => {
-                self.apply(Up(clockwise));
-                self.apply(Equator(!clockwise));
+            &UpDouble(clockwise) => {
+                self.apply(&Up(clockwise));
+                self.apply(&Equator(!clockwise));
             }
-            DownDouble(clockwise) => {
-                self.apply(Down(clockwise));
-                self.apply(Equator(clockwise));
+            &DownDouble(clockwise) => {
+                self.apply(&Down(clockwise));
+                self.apply(&Equator(clockwise));
             }
-            FrontDouble(clockwise) => {
-                self.apply(Front(clockwise));
-                self.apply(Standing(clockwise));
+            &FrontDouble(clockwise) => {
+                self.apply(&Front(clockwise));
+                self.apply(&Standing(clockwise));
             }
-            BackDouble(clockwise) => {
-                self.apply(Back(clockwise));
-                self.apply(Standing(!clockwise));
+            &BackDouble(clockwise) => {
+                self.apply(&Back(clockwise));
+                self.apply(&Standing(!clockwise));
             }
-            LeftDouble(clockwise) => {
-                self.apply(Left(clockwise));
-                self.apply(Middle(clockwise));
+            &LeftDouble(clockwise) => {
+                self.apply(&Left(clockwise));
+                self.apply(&Middle(clockwise));
             }
-            RightDouble(clockwise) => {
-                self.apply(Right(clockwise));
-                self.apply(Middle(!clockwise));
+            &RightDouble(clockwise) => {
+                self.apply(&Right(clockwise));
+                self.apply(&Middle(!clockwise));
             }
-            Middle(clockwise) => {
+            &Middle(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -317,7 +317,7 @@ impl Cube {
                     ]
                 );
             }
-            Equator(clockwise) => {
+            &Equator(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -336,7 +336,7 @@ impl Cube {
                     ]
                 );
             }
-            Standing(clockwise) => {
+            &Standing(clockwise) => {
                 rotate!(
                     if clockwise { 3 } else { 9 },
                     [
@@ -355,88 +355,29 @@ impl Cube {
                     ]
                 );
             }
-            X(clockwise) => {
-                self.apply(Right(clockwise));
-                self.apply(Middle(!clockwise));
-                self.apply(Left(!clockwise));
+            &X(clockwise) => {
+                self.apply(&Right(clockwise));
+                self.apply(&Middle(!clockwise));
+                self.apply(&Left(!clockwise));
             }
-            Y(clockwise) => {
-                self.apply(Up(clockwise));
-                self.apply(Equator(!clockwise));
-                self.apply(Down(!clockwise));
+            &Y(clockwise) => {
+                self.apply(&Up(clockwise));
+                self.apply(&Equator(!clockwise));
+                self.apply(&Down(!clockwise));
             }
-            Z(clockwise) => {
-                self.apply(Front(clockwise));
-                self.apply(Standing(clockwise));
-                self.apply(Back(!clockwise));
+            &Z(clockwise) => {
+                self.apply(&Front(clockwise));
+                self.apply(&Standing(clockwise));
+                self.apply(&Back(!clockwise));
             }
-            Sexy(true) => {
-                self.apply(Right(true));
-                self.apply(Up(true));
-                self.apply(Right(false));
-                self.apply(Up(false));
-            }
-            Sexy(false) => {
-                self.apply(Up(true));
-                self.apply(Right(true));
-                self.apply(Up(false));
-                self.apply(Right(false));
-            }
-            SledgeHammer(true) => {
-                self.apply(Right(false));
-                self.apply(Front(true));
-                self.apply(Right(true));
-                self.apply(Front(false));
-            }
-            SledgeHammer(false) => {
-                self.apply(Front(true));
-                self.apply(Right(false));
-                self.apply(Front(false));
-                self.apply(Right(true));
-            }
-            Jb(true) => {
-                // R U R' F' R U R' U' R' F R2 U' R'
-                for op in [
-                    Right(true),
-                    Up(true),
-                    Right(false),
-                    Front(false),
-                    Right(true),
-                    Up(true),
-                    Right(false),
-                    Up(false),
-                    Right(false),
-                    Front(true),
-                    Right(true),
-                    Right(true),
-                    Up(false),
-                    Right(false),
-                ] {
+            Compound(_, true, operations) => {
+                for op in operations.iter() {
                     self.apply(op);
                 }
             }
-            Jb(false) => {
-                // (R U R' F' R U R' U' R' F R2 U' R')'
-                for op in [
-                    Right(true),
-                    Up(true),
-                    Right(false),
-                    Front(false),
-                    Right(true),
-                    Up(true),
-                    Right(false),
-                    Up(false),
-                    Right(false),
-                    Front(true),
-                    Right(true),
-                    Right(true),
-                    Up(false),
-                    Right(false),
-                ]
-                .iter()
-                .rev()
-                {
-                    self.apply(op.rev());
+            Compound(_, false, operations) => {
+                for op in operations.iter().rev() {
+                    self.apply(&op.rev());
                 }
             }
         }
