@@ -13,25 +13,34 @@
   const ops = "URFU'R'F'";
   let solution_by_urf = ['(..)'];
   let solution_by_roux = ['(..)'];
+  let solution_by_cfop = ['(..)'];
 
   function run() {
     solution_by_urf = ['(..)'];
     solution_by_roux = ['(..)'];
+    solution_by_cfop = ['(..)'];
     try {
       const max_depth = 7;
       const num = 5;
-      let solution = solve("Scramble{" + scramble + "}", ops, max_depth, num, false);
+      let solution = solve("Scramble{" + scramble + "}", ops, max_depth, num, false, false);
       solution_by_urf = solution.split(';');
     } catch(e) {
       console.warn(e);
       solution_by_urf = ['Something Error (check Scramble is invalid?)'];
     }
     try {
-      let solution = solve("Scramble{" + scramble + "}", "", 0, 0, true);
+      let solution = solve("Scramble{" + scramble + "}", "", 0, 0, true, false);
       solution_by_roux = solution.split(';');
     } catch(e) {
       console.warn(e);
       solution_by_roux = ['Something Error'];
+    }
+    try {
+      let solution = solve("Scramble{" + scramble + "}", "", 0, 0, false, true);
+      solution_by_cfop = solution.split(';');
+    } catch(e) {
+      console.warn(e);
+      solution_by_cfop = ['Something Error'];
     }
   };
 
@@ -64,8 +73,8 @@
         <div class="field-label is-normal">
           <label class="label" for="scramble">Scramble</label>
         </div>
-        <div class="control">
-          <input class="input" type="text" id="scramble" bind:value={scramble} />
+        <div class="control is-expanded">
+          <input class="input is-fullwidth" type="text" id="scramble" bind:value={scramble} />
         </div>
         <div class="control">
           <button class="button is-info" on:click={run}>Solve</button>
@@ -94,6 +103,17 @@
         </thead>
         <tbody>
           {#each solution_by_roux as sol}
+            <tr><td>{sol}</td></tr>
+          {/each}
+        </tbody>
+      </table>
+
+      <table class="table is-fullwidth">
+        <thead>
+          <tr><th>Solution by CFOP</th></tr>
+        </thead>
+        <tbody>
+          {#each solution_by_cfop as sol}
             <tr><td>{sol}</td></tr>
           {/each}
         </tbody>
