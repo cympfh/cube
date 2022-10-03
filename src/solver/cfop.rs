@@ -143,7 +143,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 6, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -299,12 +299,20 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let ja = Operation::Compound(
         "Ja".to_string(),
         true,
-        read::parse_ops(&"L'U'LF L'U'LU LF'L2UL").unwrap().1.data,
+        read::parse_ops(&"r2FrU2 R'FRU F'r").unwrap().1.data,
     );
     let f = Operation::Compound(
         "F".to_string(),
         true,
-        read::parse_ops(&"R' U' F' R U R' U' R' F R2 U' R' U' R U R' U R")
+        read::parse_ops(&"R'U'F'R UR'U'R' FR2U'R' U'RUR'UR")
+            .unwrap()
+            .1
+            .data,
+    );
+    let v = Operation::Compound(
+        "V".to_string(),
+        true,
+        read::parse_ops(&"F'UF'U' R'F'R2 U'R'UR' FRF")
             .unwrap()
             .1
             .data,
@@ -367,9 +375,10 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     );
     let ways = vec![
         (vec![Up(true), Up(false), Middle(true), Middle(false)], 7),
-        (vec![Up(true), Up(false), Right(true), Right(false), f], 5),
+        (vec![Up(true), Up(false), f], 4),
+        (vec![Up(true), Up(false), v], 4),
         (vec![Up(true), Up(false), jb], 5),
-        (vec![Up(true), Up(false), ja], 5),
+        (vec![Up(true), Up(false), ja], 4),
         (vec![Up(true), Up(false), gb], 4),
         (vec![Up(true), Up(false), gd], 4),
         (vec![Up(true), Up(false), na], 4),
