@@ -20,26 +20,26 @@ benchmark-init:
 	@cargo build --release
 
 benchmark-roux: benchmark-init
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/1'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/2'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/3'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/4'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/5'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/6'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/7'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/8'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --roux < tests/random/9'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/1'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/2'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/3'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/4'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/5'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/6'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/7'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/8'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --roux < tests/random/9'
 
 benchmark-cfop: benchmark-init
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/1'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/2'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/3'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/4'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/5'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/6'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/7'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/8'
-	@hyperfine -w 1 -r 10 'cargo run --release -- -q --cfop < tests/random/9'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/1'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/2'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/3'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/4'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/5'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/6'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/7'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/8'
+	@hyperfine -w 1 -r 8 'cargo run --release -- -q --cfop < tests/random/9'
 
 test:
 	cargo test
