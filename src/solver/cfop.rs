@@ -347,7 +347,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let v = Operation::Compound(
         "V".to_string(),
         true,
-        read::parse_ops(&"F'UF'U 'R'F'R2 U'R'UR' FRF")
+        read::parse_ops(&"F'UF'U' R'F'R2 U'R'UR' FRF")
             .unwrap()
             .1
             .data,
