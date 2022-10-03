@@ -72,10 +72,8 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Right(false),
         Left(true),
         Left(false),
-        Middle(true),
-        Middle(false),
     ];
-    match search_one(&subcube, &subgoal, allowed_ops, 4, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 5, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -85,7 +83,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         }
     }
 
-    info!("F2L/#1+2");
+    info!("F2L/#1+#2");
     let subgoal = cube![
         . . . ;
         . Y . ;
@@ -111,7 +109,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&subcube, &subgoal, allowed_ops, 6, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 4, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
