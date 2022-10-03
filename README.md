@@ -8,14 +8,17 @@ A 3x3x3 cube solver
 # Install `cube` command
 $ cargo install --path .
 
-# Samples
+# Input Samples
 $ cat sample.input
 $ cat sample2.input
 
-# Solving with U, D and F operations
+# Solving only with U, D and F operations
 $ cube -UDF < sample.input
 [2022-09-06T06:24:39Z INFO ] Solution: DDU'
 {"ok":true,"solutions":[{"algorithm":"DDU'","length":3}]}
+
+# Solving with CFOP Method
+$ cube --cfop < sample2.input
 
 # Solving with Roux Method
 $ cube --roux < sample2.input
@@ -55,23 +58,11 @@ Goal {
 }
 ```
 
-You can pass **scramble** insteade of initial state.
+Or you can give **scramble**.
 
 ```dot
 Scramble {
   U D2
-}
-
-Goal {
-  YYY
-  YYY
-  YYY
-  RRR GGG OOO BBB
-  RRR GGG OOO BBB
-  RRR GGG OOO BBB
-  WWW
-  WWW
-  WWW
 }
 ```
 
