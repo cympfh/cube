@@ -301,6 +301,14 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
         true,
         read::parse_ops(&"r2FrU2 R'FRU F'r").unwrap().1.data,
     );
+    let e = Operation::Compound(
+        "E".to_string(),
+        true,
+        read::parse_ops(&"R B' R' F R B R' F' R B R' F R B' R' F'")
+            .unwrap()
+            .1
+            .data,
+    );
     let f = Operation::Compound(
         "F".to_string(),
         true,
@@ -376,6 +384,7 @@ pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let ways = vec![
         (vec![Up(true), Up(false), Middle(true), Middle(false)], 7),
         (vec![Up(true), Up(false), f], 4),
+        (vec![Up(true), Up(false), e], 4),
         (vec![Up(true), Up(false), v], 4),
         (vec![Up(true), Up(false), jb], 5),
         (vec![Up(true), Up(false), ja], 4),
