@@ -76,6 +76,12 @@ impl Operation {
             Compound(_, clockwise, _) => !clockwise,
         }
     }
+    pub fn is_compound(&self) -> bool {
+        match self {
+            Operation::Compound(_, _, _) => true,
+            _ => false,
+        }
+    }
 }
 
 impl std::fmt::Display for Operation {
@@ -222,14 +228,16 @@ impl Ops {
             ops.push(op.clone());
             let m = ops.len();
             if m >= 3 {
-                let a = ops.data[m - 1].clone();
-                let b = ops.data[m - 2].clone();
-                let c = ops.data[m - 3].clone();
-                if a == b && a == c {
-                    ops.pop();
-                    ops.pop();
-                    ops.pop();
-                    ops.push(a.rev());
+                if !ops.data[m - 1].is_compound() {
+                    let a = ops.data[m - 1].clone();
+                    let b = ops.data[m - 2].clone();
+                    let c = ops.data[m - 3].clone();
+                    if a == b && a == c {
+                        ops.pop();
+                        ops.pop();
+                        ops.pop();
+                        ops.push(a.rev());
+                    }
                 }
             }
             let m = ops.len();
