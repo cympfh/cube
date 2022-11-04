@@ -1,18 +1,8 @@
 use crate::cube;
 use crate::entities::*;
-use crate::solver::search;
+use crate::read;
+use crate::solver::{search_any, search_one};
 use log::info;
-
-fn search_one(
-    init_state: &Cube,
-    goal: &Cube,
-    allowed_ops: Vec<Operation>,
-    max_depth: usize,
-    verbose: bool,
-) -> Option<Ops> {
-    let algs = search(init_state, goal, allowed_ops, max_depth, 1, verbose);
-    algs.get(0).cloned()
-}
 
 pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     let mut cube: Cube = cube.clone();
@@ -22,16 +12,18 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("FB/1");
     let subgoal = cube![
-        * * * ;
-        * * * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R * * * * * * * * * B B ;
-        R * * * * * * * * * B B ;
-        W * * ;
-        W * * ;
-        * * * ;
+        . . . ;
+        . . . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R . . . . . . . . . B B ;
+        R . . . . . . . . . B B ;
+        W . . ;
+        W . . ;
+        . . . ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Front(true),
         Front(false),
@@ -46,7 +38,7 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
         Left(true),
         Left(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -58,16 +50,18 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("FB/2");
     let subgoal = cube![
-        * * * ;
-        * * * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R * * * * * * * O B B B ;
-        R * * * * * * * O B B B ;
-        W * * ;
-        W * * ;
-        W * * ;
+        . . . ;
+        . . . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R . . . . . . . O B B B ;
+        R . . . . . . . O B B B ;
+        W . . ;
+        W . . ;
+        W . . ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Back(true),
         Back(false),
@@ -78,7 +72,7 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
         RightDouble(true),
         RightDouble(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -90,16 +84,18 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("SB/1");
     let subgoal = cube![
-        * * * ;
-        * * * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R * R G G * * * O B B B ;
-        R * R G G * * * O B B B ;
-        W * W ;
-        W * W ;
-        W * * ;
+        . . . ;
+        . . . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R . R G G . . . O B B B ;
+        R . R G G . . . O B B B ;
+        W . W ;
+        W . W ;
+        W . . ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Up(true),
         Up(false),
@@ -110,7 +106,7 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
         Middle(true),
         Middle(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -122,16 +118,18 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
 
     info!("SB/2");
     let subgoal = cube![
-        * * * ;
-        * * * ;
-        * * * ;
-        * * * * * * * * * * * * ;
-        R * R G G G O * O B B B ;
-        R * R G G G O * O B B B ;
-        W * W ;
-        W * W ;
-        W * W ;
+        . . . ;
+        . . . ;
+        . . . ;
+        . . . . . . . . . . . . ;
+        R . R G G G O . O B B B ;
+        R . R G G G O . O B B B ;
+        W . W ;
+        W . W ;
+        W . W ;
     ];
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
     let allowed_ops = vec![
         Up(true),
         Up(false),
@@ -142,7 +140,7 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
         Middle(true),
         Middle(false),
     ];
-    match search_one(&cube, &subgoal, allowed_ops, 8, verbose) {
+    match search_one(&subcube, &subgoal, allowed_ops, 8, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
@@ -153,111 +151,71 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     }
 
     info!("CMLL");
-    let mut cm = cube.clone();
-    cm.up[(0, 1)] = Color::Other;
-    cm.up[(1, 0)] = Color::Other;
-    cm.up[(1, 1)] = Color::Other;
-    cm.up[(1, 2)] = Color::Other;
-    cm.up[(2, 1)] = Color::Other;
-    cm.front[(0, 1)] = Color::Other;
-    cm.front[(1, 1)] = Color::Other;
-    cm.front[(2, 1)] = Color::Other;
-    cm.back[(0, 1)] = Color::Other;
-    cm.back[(1, 1)] = Color::Other;
-    cm.back[(2, 1)] = Color::Other;
-    cm.right[(0, 1)] = Color::Other;
-    cm.right[(2, 1)] = Color::Other;
-    cm.left[(0, 1)] = Color::Other;
-    cm.left[(2, 1)] = Color::Other;
-    cm.down[(0, 1)] = Color::Other;
-    cm.down[(1, 1)] = Color::Other;
-    cm.down[(2, 1)] = Color::Other;
-
     let subgoal = cube![
         Y . Y ;
         . . . ;
         Y . Y ;
         R . R G . G O . O B . B ;
         R . R G G G O . O B B B ;
-        R . R G . G O . O B . B ;
+        R . R G G G O . O B B B ;
         W . W ;
         W . W ;
         W . W ;
     ];
-    let allowed_ops = vec![
-        Front(true),
-        Front(false),
-        Up(true),
-        Up(false),
-        Right(true),
-        Right(false),
+    let mut subcube = cube.clone();
+    subcube.mask(&subgoal);
+    let sexy = Operation::Compound(
+        "Sx".to_string(),
+        true,
+        read::parse_ops(&"RUR'U'").unwrap().1.data,
+    );
+    let ways = vec![
+        (vec![Up(true), Up(false), Right(true), Right(false)], 8),
+        (
+            vec![
+                Up(true),
+                Up(false),
+                sexy.clone(),
+                sexy.rev(),
+                Front(true),
+                Front(false),
+            ],
+            6,
+        ),
+        (
+            vec![
+                Front(true),
+                Front(false),
+                Up(true),
+                Up(false),
+                Right(true),
+                Right(false),
+            ],
+            8,
+        ),
+        (
+            vec![
+                Front(true),
+                Front(false),
+                Up(true),
+                Up(false),
+                Down(true),
+                Down(false),
+                Right(true),
+                Right(false),
+            ],
+            8,
+        ),
     ];
-    match search_one(&cm, &subgoal, allowed_ops, 10, verbose) {
+    match search_any(&subcube, &subgoal, ways, verbose, 20) {
         Some(alg) => {
             algorithm.extend(&alg);
             cube = alg.apply(&cube);
         }
         None => {
-            info!("CMLL'");
-            let allowed_ops = vec![Up(true), Up(false), Right(true), Right(false)];
-            match search_one(&cm, &subgoal, allowed_ops, 12, verbose) {
-                Some(alg) => {
-                    algorithm.extend(&alg);
-                    cube = alg.apply(&cube);
-                }
-                None => {
-                    info!("CMLL''");
-                    let allowed_ops = vec![
-                        Front(true),
-                        Front(false),
-                        Up(true),
-                        Up(false),
-                        Down(true),
-                        Down(false),
-                        RightDouble(true),
-                        RightDouble(false),
-                    ];
-                    match search_one(&cm, &subgoal, allowed_ops, 8, verbose) {
-                        Some(alg) => {
-                            algorithm.extend(&alg);
-                            cube = alg.apply(&cube);
-                        }
-                        None => {
-                            return None;
-                        }
-                    }
-                }
-            }
+            return None;
         }
     }
-
-    // info!("LSE/UL&UR");
-    // let subgoal = cube![
-    //     Y * Y ;
-    //     Y * Y ;
-    //     Y * Y ;
-    //     R * R G G G O * O B B B ;
-    //     R * R G G G O * O B B B ;
-    //     R * R G G G O * O B B B ;
-    //     W * W ;
-    //     W * W ;
-    //     W * W ;
-    // ];
-    // let allowed_ops = vec![
-    //     Up(true),
-    //     Up(false),
-    //     Middle(true),
-    //     Middle(false),
-    // ];
-    // match search_one(&cube, &subgoal, allowed_ops, 12, verbose) {
-    //     Some(alg) => {
-    //         algorithm.extend(&alg);
-    //         cube = alg.apply(&cube);
-    //     }
-    //     None => {
-    //         return None;
-    //     }
-    // }
 
     info!("LSE");
     let subgoal = cube![
@@ -275,12 +233,13 @@ pub fn roux(cube: &Cube, verbose: bool) -> Option<Ops> {
     match search_one(&cube, &subgoal, allowed_ops, 12, verbose) {
         Some(alg) => {
             algorithm.extend(&alg);
-            // cube = alg.apply(&cube);
+            cube = alg.apply(&cube);
         }
         None => {
             return None;
         }
     }
 
+    info!("{}", cube);
     Some(algorithm.shorten())
 }

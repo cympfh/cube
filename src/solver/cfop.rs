@@ -1,43 +1,8 @@
 use crate::cube;
 use crate::entities::*;
 use crate::read;
-use crate::solver::search;
+use crate::solver::{search_any, search_one};
 use log::info;
-
-fn search_one(
-    init_state: &Cube,
-    goal: &Cube,
-    allowed_ops: Vec<Operation>,
-    max_depth: usize,
-    verbose: bool,
-) -> Option<Ops> {
-    let algs = search(init_state, goal, allowed_ops, max_depth, 1, verbose);
-    algs.get(0).cloned()
-}
-
-fn search_any(
-    init_state: &Cube,
-    goal: &Cube,
-    ways: Vec<(Vec<Operation>, usize)>,
-    verbose: bool,
-    better_length: usize,
-) -> Option<Ops> {
-    let mut min_length = 999;
-    let mut ret = None;
-    for (allowed_ops, max_depth) in ways {
-        let algs = search(init_state, goal, allowed_ops, max_depth, 1, verbose);
-        if let Some(alg) = algs.get(0).map(|alg| alg.expand().shorten()) {
-            if alg.len() <= better_length {
-                return Some(alg);
-            }
-            if alg.len() < min_length {
-                min_length = alg.len();
-                ret = Some(alg);
-            }
-        }
-    }
-    ret
-}
 
 pub fn cfop(cube: &Cube, verbose: bool) -> Option<Ops> {
     let mut cube = cube.clone();
