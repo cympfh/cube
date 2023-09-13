@@ -124,7 +124,7 @@
 
   <section class="section">
     <div class="content has-text-centered">
-      <a href="https://sites.google.com/site/happybusy/" target="_blank">
+      <a href="https://sites.google.com/view/happy-busy/" target="_blank">
         <img src="/cube/busy_banner.png" alt="happybusy" /></a>
     </div>
   </section>
